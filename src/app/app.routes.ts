@@ -1,3 +1,50 @@
-import { Routes } from '@angular/router';
+/* definisco le rotte (URL) dell'app */
 
-export const routes: Routes = [];
+import { Routes } from '@angular/router'; /* importo Routes da angular router perché
+mi serve per tipizzare le rotte */
+
+export const routes: Routes = [
+  {
+    path: '',  /* root dell'app, cioè quando entro su http://localhost:4200 */
+
+    pathMatch: 'full', /* matcha solo se l'URL è ESATTAMENTE vuoto,
+       così evito che faccia match parziali strani */
+
+    redirectTo: 'auth'
+    /* se sono sulla root mi manda direttamente alla pagina di login */
+  },
+
+  {
+    path: 'auth', /* rotta per il login */
+
+    loadComponent: () => /* uso loadComponent perché sono in standalone
+       e voglio fare lazy loading (carica solo quando serve) */
+
+      import('./features/auth/pages/login/login') /* import dinamico → crea uno chunk separato */
+
+        .then(m => m.Login) /* m è il modulo importato dinamicamente e io prendo il LoginComponent da lì */
+  },
+
+  {
+    path: 'users', /* pagina lista utenti */
+
+    loadComponent: () =>
+      import('./features/users/pages/users-list/users-list')
+        .then(m => m.UsersList)
+        /* stesso concetto che ho fatto sopra, lazy loading */
+  },
+
+  {
+    path: 'posts', /* pagina lista post */
+
+    loadComponent: () =>
+      import('./features/posts/pages/posts-list/posts-list')
+        .then(m => m.PostsList)
+  },
+
+  {
+    path: '**', /* wildcard → per intercettare qualsiasi URL non definito sopra */
+
+    redirectTo: 'auth' /* se l'utente scrive un URL sbagliato, lo riporto al login per sicurezza */
+  }
+];
