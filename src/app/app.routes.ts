@@ -1,5 +1,7 @@
 /* definisco le rotte (URL) dell'app */
 
+import { authGuard } from './core/guards/auth-guard';
+
 import { Routes } from '@angular/router'; /* importo Routes da angular router perché
 mi serve per tipizzare le rotte */
 
@@ -28,6 +30,7 @@ export const routes: Routes = [
   {
     path: 'users', /* pagina lista utenti */
 
+    canActivate: [authGuard], /* proteggo questa rotta */
     loadComponent: () =>
       import('./features/users/pages/users-list/users-list')
         .then(m => m.UsersList)
@@ -37,8 +40,9 @@ export const routes: Routes = [
   {
     path: 'posts', /* pagina lista post */
 
-    loadComponent: () =>
-      import('./features/posts/pages/posts-list/posts-list')
+     canActivate: [authGuard], /* proteggo anche questa */
+     loadComponent: () =>
+       import('./features/posts/pages/posts-list/posts-list')
         .then(m => m.PostsList)
   },
 
