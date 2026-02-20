@@ -1,0 +1,20 @@
+/* stile base per la pagina lista utenti */
+
+table {
+  width: 100%;
+}
+
+h1 {
+  margin: 0 0 16px 0;
+}
+
+.users-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.users-toolbar mat-form-field {
+  min-width: 220px;
+}

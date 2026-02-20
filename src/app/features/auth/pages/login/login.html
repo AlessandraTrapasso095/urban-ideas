@@ -1,1 +1,52 @@
-<p>login works!</p>
+<!-- pagina login: qui l'utente incolla il token GoREST -->
+
+<div class="login-page">
+  <!-- contenitore semplice per centrare e dare ordine -->
+
+  <h1>Login</h1>
+  <!-- titolo pagina -->
+
+  <p>
+    Incolla qui il tuo token GoREST (Bearer Token) per accedere all'app.
+  </p>
+  <!-- spiegazione veloce per l'utente -->
+
+  <mat-form-field appearance="outline" class="full-width">
+    <!-- mat-form-field = contenitore Material per input
+         outline = stile più pulito e "da prodotto" -->
+
+    <mat-label>Token</mat-label>
+    <!-- label del campo -->
+
+    <input
+      matInput
+      [formControl]="tokenControl"
+      placeholder="es. 9a1b2c3d..."
+      autocomplete="off"
+    />
+    <!-- matInput = stile Material
+         formControl = collego l'input al tokenControl in login.ts
+         placeholder = esempio visivo
+         autocomplete off = evito suggerimenti strani del browser -->
+
+    <mat-hint>Il token viene salvato solo nel tuo browser.</mat-hint>
+    <!-- piccola nota rassicurante -->
+
+    <mat-error *ngIf="tokenControl.touched && tokenControl.hasError('required')">
+      Il token è obbligatorio.
+    </mat-error>
+    <!-- mostro errore solo se l'utente ha toccato il campo e lo lascia vuoto -->
+  </mat-form-field>
+
+  <button
+    mat-raised-button
+    type="button"
+    (click)="login()"
+    [disabled]="tokenControl.invalid"
+  >
+    Entra
+  </button>
+  <!-- bottone Material
+       click = chiama login()
+       disabled = non faccio cliccare se il campo è vuoto -->
+</div>

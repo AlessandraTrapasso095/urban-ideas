@@ -1,0 +1,17 @@
+.form {
+  display: grid;
+  gap: 12px;
+  padding-top: 8px;
+}
+/* layout semplice e pulito: campi uno sotto l'altro */
+
+.full {
+  width: 100%;
+}
+/* i form-field occupano tutta la larghezza */
+
+.error {
+  margin: 8px 0 0 0;
+  color: #b00020;
+}
+/* stile semplice per messaggio errore */
