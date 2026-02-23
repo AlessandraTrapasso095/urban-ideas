@@ -98,7 +98,12 @@
 
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef>Nome</th>
-    <td mat-cell *matCellDef="let user">{{ user.name }}</td>
+    <td mat-cell *matCellDef="let user">
+    <button mat-button type="button" (click)="goToDetail(user)">
+      {{ user.name }}
+    </button>
+  </td>
+<!-- rendo il nome cliccabile e porto al dettaglio -->
   </ng-container>
 
   <ng-container matColumnDef="email">

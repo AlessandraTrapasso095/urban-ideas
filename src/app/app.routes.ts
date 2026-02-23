@@ -38,6 +38,19 @@ export const routes: Routes = [
   },
 
   {
+    path: 'users/:id',
+    /* rotta dettaglio utente: :id è un parametro dinamico (es. /users/123) */
+
+    canActivate: [authGuard],
+    /* proteggo anche questa rotta: serve token */
+
+    loadComponent: () =>
+      import('./features/users/pages/user-detail/user-detail')
+        .then(m => m.UserDetail)
+        /* lazy loading: carico la pagina dettaglio solo quando serve */
+  },
+
+  {
     path: 'posts', /* pagina lista post */
 
      canActivate: [authGuard], /* proteggo anche questa */

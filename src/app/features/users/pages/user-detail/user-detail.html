@@ -1,0 +1,69 @@
+<!-- pagina dettaglio utente -->
+
+<h1>Dettaglio utente</h1>
+
+<p *ngIf="isLoading">
+  Caricamento...
+</p>
+<!-- loading -->
+
+<p *ngIf="!isLoading && errorMessage">
+  {{ errorMessage }}
+</p>
+<!-- errore -->
+
+<div *ngIf="!isLoading && !errorMessage && user">
+  <p><strong>ID:</strong> {{ user.id }}</p>
+  <p><strong>Nome:</strong> {{ user.name }}</p>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+  <p><strong>Gender:</strong> {{ user.gender }}</p>
+  <p><strong>Status:</strong> {{ user.status }}</p>
+</div>
+<!-- dettagli utente: li mostro solo se user esiste e non sto caricando e non ho errori -->
+
+<p *ngIf="!isLoading && !errorMessage && !user">
+  Nessun dato utente disponibile.
+</p>
+<!-- caso “vuoto”: caricamento finito, nessun errore, ma user è null -->
+
+<hr />
+
+<h2>Post dell'utente</h2>
+
+<p *ngIf="postsLoading">
+  Caricamento post...
+</p>
+<!-- loading post -->
+
+<p *ngIf="!postsLoading && postsError">
+  {{ postsError }}
+</p>
+<!-- errore post -->
+
+<p *ngIf="!postsLoading && !postsError && posts.length === 0">
+  Nessun post trovato.
+</p>
+<!-- nessun post: caricamento finito e nessun errore -->
+
+<div *ngIf="!postsLoading && !postsError && posts.length > 0">
+  <!-- lista post: la mostro solo quando ho almeno 1 post -->
+
+  <div
+    *ngFor="let post of posts"
+    style="border: 1px solid #ddd; padding: 12px; margin-bottom: 12px;"
+  >
+    <p><strong>Titolo:</strong> {{ post.title }}</p>
+    <p><strong>Testo:</strong> {{ post.body }}</p>
+
+    <!-- COMPONENTE FIGLIO:
+         delego completamente gestione commenti al figlio (C pulito)
+         - carica commenti
+         - mostra/nasconde
+         - crea commento
+         - gestisce errori/loading/draft
+    -->
+    <app-post-comments [postId]="post.id"></app-post-comments>
+  </div>
+</div>
+
+<hr />

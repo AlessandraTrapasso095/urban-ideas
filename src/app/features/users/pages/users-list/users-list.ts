@@ -11,13 +11,10 @@ import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 /* MatTableModule = tabella Angular Material */
 /* MatTableDataSource = oggetto che gestisce i dati mostrati nella tabella */
 
-import {
-  UsersService,
-  User,
-  UserSearchField,
-  PaginatedResponse,
-} from '../../services/users.service';
+import { UsersService } from '../../services/users.service';
 /* UsersService = fa le chiamate HTTP */
+
+import { User, UserSearchField, PaginatedResponse } from '../../models/gorest-models.model';
 /* User = tipo singolo utente */
 /* UserSearchField = tipo per campo ricerca ('name' | 'email') */
 /* PaginatedResponse = risposta con dati + info paginazione */
@@ -44,11 +41,19 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 /* MatDialog = servizio per aprire finestre modali */
 /* MatDialogModule = supporto dialog nei component standalone */
 
-import { CreateUserDialog } from '../../create-user-dialog/create-user-dialog';
+import { CreateUserDialog } from '../../dialogs/create-user-dialog/create-user-dialog';
 /* dialog creazione utente */
 
-import { ConfirmDeleteDialog } from '../../confirm-delete-dialog/confirm-delete-dialog';
+import { ConfirmDeleteDialog } from '../../dialogs/confirm-delete-dialog/confirm-delete-dialog';
 /* dialog conferma eliminazione */
+
+import { Router } from '@angular/router';
+/* Router = mi serve per navigare verso la pagina dettaglio utente */
+
+import { RouterModule } from '@angular/router';
+
+import { buildHttpErrorMessage } from '../../../../core/utils/http-messages';
+/* DRY: messaggi errore standard */
 
 @Component({
   selector: 'app-users-list',
@@ -64,6 +69,7 @@ import { ConfirmDeleteDialog } from '../../confirm-delete-dialog/confirm-delete-
     MatSelectModule,
     MatButtonModule,
     MatDialogModule,
+    RouterModule,
   ],
 
   templateUrl: './users-list.html',
@@ -107,10 +113,13 @@ export class UsersList implements OnInit {
 
   constructor(
     private usersService: UsersService,
-    /* service per chiamate API */
+    /* inietto il service per poter chiamare le API */
 
-    private dialog: MatDialog
-    /* servizio per aprire dialog */
+    private dialog: MatDialog,
+    /* inietto MatDialog per aprire dialog create/edit/delete */
+
+    private router: Router
+    /* inietto Router per navigare al dettaglio utente */
   ) {}
 
   ngOnInit(): void {
@@ -157,14 +166,28 @@ export class UsersList implements OnInit {
   });
 
   dialogRef.afterClosed().subscribe((updatedUser: User | undefined) => {
+  /* quando chiudo il dialog posso ricevere l'utente aggiornato */
+
   if (!updatedUser) return;
+  /* se annullo, esco */
 
   this.dataSource.data = this.dataSource.data.map((u) =>
     u.id === updatedUser.id ? updatedUser : u
-   );
+  );
+  /* creo un nuovo array e sostituisco SOLO la riga con lo stesso id */
+  /* Angular vede l'array nuovo e la tabella si aggiorna subito */
+
+  // this.applySearch();
+  /* opzionale: se vuoi riallinearti al server (header pagination/total), puoi ricaricare */
  });
 }
 
+  goToDetail(user: User): void {
+    /* navigo verso la pagina dettaglio utente */
+
+    this.router.navigate(['/users', user.id]);
+    /* creo l'URL /users/:id */
+  }
 
   /* =========================
      DELETE UTENTE
@@ -209,20 +232,22 @@ export class UsersList implements OnInit {
             next: () => {
               /* delete ok */
 
-              this.applySearch();
-              /* ricarico lista dal server */
+              this.dataSource.data = this.dataSource.data.filter((u) => u.id !== user.id);
+              /* tolgo subito la riga dalla tabella */
+
+              this.total = Math.max(0, this.total - 1);
+             /* aggiorno il totale client-side per coerenza visiva */
+
+              if (this.dataSource.data.length === 0 && this.page > 1) {
+              this.page -= 1;
+             /* se ho svuotato la pagina corrente e non sono in pagina 1, torno indietro */
+            }
+
+             this.applySearch();
+             /* poi ricarico dal server per riallineare paginazione vera dagli header */
             },
             error: (err: unknown) => {
-
-              const status =
-                typeof err === 'object' &&
-                err !== null &&
-                'status' in err
-                  ? (err as { status?: number }).status
-                  : undefined;
-
-              this.errorMessage =
-                `Errore eliminazione utente (status: ${status ?? 'unknown'})`;
+              this.errorMessage = buildHttpErrorMessage('eliminazione utente', err);
             },
           });
 
@@ -269,16 +294,7 @@ export class UsersList implements OnInit {
           this.perPage = res.limit;
         },
         error: (err: unknown) => {
-
-          const status =
-            typeof err === 'object' &&
-            err !== null &&
-            'status' in err
-              ? (err as { status?: number }).status
-              : undefined;
-
-          this.errorMessage =
-            `Errore nel caricamento (status: ${status ?? 'unknown'})`;
+         this.errorMessage = buildHttpErrorMessage('nel caricamento', err);
         },
       });
   }
