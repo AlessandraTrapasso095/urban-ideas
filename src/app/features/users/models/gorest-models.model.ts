@@ -64,6 +64,9 @@ export interface Post {
   /* contenuto */
 }
 
+export type CreatePostDto = Omit<Post, 'id'>;
+/* per creare un post: è un Post senza id */
+
 export interface Comment {
   /* commento come arriva da GoREST */
 

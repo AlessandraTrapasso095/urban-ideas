@@ -55,14 +55,8 @@
     <p><strong>Titolo:</strong> {{ post.title }}</p>
     <p><strong>Testo:</strong> {{ post.body }}</p>
 
-    <!-- COMPONENTE FIGLIO:
-         delego completamente gestione commenti al figlio (C pulito)
-         - carica commenti
-         - mostra/nasconde
-         - crea commento
-         - gestisce errori/loading/draft
-    -->
     <app-post-comments [postId]="post.id"></app-post-comments>
+    <!-- componente figlio: gestisce apertura, caricamento, lista e invio commenti -->
   </div>
 </div>
 

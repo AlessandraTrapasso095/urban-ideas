@@ -1,23 +1,14 @@
-/* stile della pagina login */
-
-.login-page {
-  max-width: 420px;
-  margin: 64px auto;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.form {
+  display: grid;
+  gap: 12px;
+  padding-top: 8px;
 }
 
-.full-width {
+.full {
   width: 100%;
 }
 
-h1 {
-  margin: 0;
-}
-
-p {
-  margin: 0;
-  opacity: 0.8;
+.error {
+  margin: 8px 0 0 0;
+  color: #b00020;
 }

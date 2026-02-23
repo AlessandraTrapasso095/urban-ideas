@@ -13,8 +13,8 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 /* trasformo la response (header + body) in un oggetto più comodo */
 
-import { PaginatedResponse, User } from '../../features/users/models/gorest-models.model';
-/* importo i tipi (sono SOLO tipi, non servizi) */
+import { PaginatedResponse } from '../../features/users/models/gorest-models.model';
+/* importo SOLO il tipo paginato (DRY) */
 
 @Injectable({
   providedIn: 'root',
@@ -32,12 +32,12 @@ export class GorestApiService {
     return this.baseUrl;
   }
 
-  private mapPaginatedResponse(
-    res: HttpResponse<User[]>,
+  private mapPaginatedResponse<T>(
+    res: HttpResponse<T[]>,
     page: number,
     perPage: number
-  ): PaginatedResponse<User> {
-    /* trasformo response in PaginatedResponse */
+  ): PaginatedResponse<T> {
+    /* trasformo response in PaginatedResponse<T> */
 
     const pageHeader = Number(res.headers.get('x-pagination-page') ?? page);
     /* pagina corrente dagli header */
@@ -53,7 +53,7 @@ export class GorestApiService {
 
     return {
       data: res.body ?? [],
-      /* body = array utenti */
+      /* body = array di dati */
 
       page: pageHeader,
       pages: pagesHeader,
@@ -62,20 +62,25 @@ export class GorestApiService {
     };
   }
 
-  getUsersWithParams(
+  getPaginatedWithParams<T>(
+    endpoint: string,
     params: HttpParams,
     page: number,
     perPage: number
-  ): Observable<PaginatedResponse<User>> {
-    /* metodo DRY: fa la GET e mappa gli header di paginazione */
+  ): Observable<PaginatedResponse<T>> {
+    /* metodo DRY GENERICO:
+       fa la GET su endpoint e mappa gli header di paginazione */
 
     return this.http
-      .get<User[]>(`${this.baseUrl}/users`, { params, observe: 'response' })
+      .get<T[]>(`${this.baseUrl}/${endpoint}`, {
+        params,
+        observe: 'response',
+      })
       /* faccio GET osservando tutta la response per leggere gli header */
 
       .pipe(
-        map((res: HttpResponse<User[]>) => this.mapPaginatedResponse(res, page, perPage))
+        map((res: HttpResponse<T[]>) => this.mapPaginatedResponse<T>(res, page, perPage))
       );
-      /* trasformo HttpResponse<User[]> in PaginatedResponse<User> */
+      /* trasformo HttpResponse<T[]> in PaginatedResponse<T> */
   }
 }

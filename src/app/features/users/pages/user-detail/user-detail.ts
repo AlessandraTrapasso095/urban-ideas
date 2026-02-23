@@ -1,4 +1,4 @@
-/* pagina dettaglio utente: qui mostro i dettagli e poi i post/commenti */
+/* pagina dettaglio utente: qui mostro i dettagli e poi i post */
 
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 /* OnInit = eseguo codice quando la pagina si carica */
@@ -14,9 +14,9 @@ import { UsersService } from '../../services/users.service';
 /* chiamo API utenti */
 
 import { PostsService } from '../../services/posts.service';
-/* chiamo API post + commenti */
+/* chiamo API post */
 
-import { User, Post, Comment, CreateCommentDto } from '../../models/gorest-models.model';
+import { User, Post } from '../../models/gorest-models.model';
 /* tipi condivisi DRY */
 
 import { finalize, timeout } from 'rxjs/operators';
@@ -26,13 +26,10 @@ import { finalize, timeout } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 /* Observable = tipo delle chiamate http che useremo nel metodo DRY */
 
-import { FormsModule } from '@angular/forms';
-/* FormsModule = mi serve per [(ngModel)] nel form commenti */
-
 import { buildHttpErrorMessage } from '../../../../core/utils/http-messages';
 /* DRY: messaggi errore standard */
 
-import { PostComments } from '../../components/post-comments/post-comments';
+import { PostCommentsComponent } from '../../components/post-comments/post-comments';
 
 @Component({
   selector: 'app-user-detail',
@@ -42,10 +39,8 @@ import { PostComments } from '../../components/post-comments/post-comments';
     CommonModule,
     /* abilito direttive base nel template */
 
-    FormsModule,
-    /* abilito ngModel nel template */
-
-    PostComments,
+    PostCommentsComponent,
+    /* componente figlio che gestisce commenti */
   ],
 
   templateUrl: './user-detail.html',
@@ -73,27 +68,6 @@ export class UserDetail implements OnInit {
   postsError = '';
   /* errore post */
 
-  commentsByPostId: Record<number, Comment[]> = {};
-  /* commenti per post */
-
-  commentsLoadingByPostId: Record<number, boolean> = {};
-  /* loading commenti */
-
-  commentsErrorByPostId: Record<number, string> = {};
-  /* errore commenti */
-
-  commentsOpenByPostId: Record<number, boolean> = {};
-  /* stato apertura commenti */
-
-  commentDraftByPostId: Record<number, { name: string; email: string; body: string }> = {};
-  /* bozza commento per ogni post */
-
-  commentSubmittingByPostId: Record<number, boolean> = {};
-  /* loading invio commento per singolo post */
-
-  commentSubmitErrorByPostId: Record<number, string> = {};
-  /* errore invio commento per singolo post */
-
   constructor(
     private route: ActivatedRoute,
     /* leggo parametro id dall'URL */
@@ -102,7 +76,7 @@ export class UserDetail implements OnInit {
     /* chiamo le API (solo user) */
 
     private postsService: PostsService,
-    /* chiamo le API (post + commenti) */
+    /* chiamo le API (post) */
 
     private cdr: ChangeDetectorRef
     /* forzo refresh view quando cambia lo state */
@@ -244,131 +218,6 @@ export class UserDetail implements OnInit {
       onSuccess: (posts) => {
         this.posts = posts;
         /* salvo lista post */
-      },
-    });
-  }
-
-  toggleComments(postId: number): void {
-    /* apro/chiudo commenti di un post */
-
-    const isOpen = this.commentsOpenByPostId[postId] ?? false;
-    /* se non esiste ancora considero chiuso */
-
-    this.commentsOpenByPostId[postId] = !isOpen;
-    /* toggle */
-
-    this.refreshView();
-    /* aggiorno view */
-
-    if (!this.commentsOpenByPostId[postId]) {
-      /* se ho appena chiuso, non faccio altro */
-      return;
-    }
-
-    this.ensureDraft(postId);
-    /* preparo il form commento */
-
-    if (this.commentsByPostId[postId]) {
-      /* se li ho già caricati, non li ricarico */
-      return;
-    }
-
-    this.loadComments(postId);
-    /* al primo open, carico commenti */
-  }
-
-  loadComments(postId: number): void {
-    /* carico commenti del post */
-
-    this.runRequest<Comment[]>({
-      /* uso helper DRY */
-
-      request$: this.postsService.getPostComments(postId),
-      /* GET /posts/:id/comments */
-
-      setLoading: (v) => (this.commentsLoadingByPostId[postId] = v),
-      /* loading commenti SOLO di quel post */
-
-      setError: (msg) => (this.commentsErrorByPostId[postId] = msg),
-      /* errore commenti SOLO di quel post */
-
-      actionLabel: 'caricamento commenti',
-      /* etichetta per buildHttpErrorMessage */
-
-      onSuccess: (comments) => {
-        this.commentsByPostId[postId] = comments;
-        /* salvo commenti caricati */
-      },
-    });
-  }
-
-  private ensureDraft(postId: number): void {
-    /* creo una bozza se non esiste */
-
-    if (!this.commentDraftByPostId[postId]) {
-      this.commentDraftByPostId[postId] = {
-        name: '',
-        email: '',
-        body: '',
-      };
-      /* valori iniziali */
-    }
-  }
-
-  submitComment(postId: number): void {
-    /* invio un commento per un post */
-
-    this.ensureDraft(postId);
-    /* mi assicuro che la bozza esista */
-
-    const draft = this.commentDraftByPostId[postId];
-    /* recupero valori inseriti */
-
-    const dto: CreateCommentDto = {
-      name: draft.name.trim(),
-      email: draft.email.trim(),
-      body: draft.body.trim(),
-    };
-    /* pulisco gli spazi */
-
-    if (!dto.name || !dto.email || !dto.body) {
-      this.commentSubmitErrorByPostId[postId] = 'Compila tutti i campi.';
-      /* validazione base */
-
-      this.refreshView();
-      /* aggiorno view */
-
-      return;
-    }
-
-    this.runRequest<Comment>({
-      /* uso helper DRY */
-
-      request$: this.postsService.createComment(postId, dto),
-      /* POST /posts/:id/comments */
-
-      setLoading: (v) => (this.commentSubmittingByPostId[postId] = v),
-      /* loading invio SOLO di quel post */
-
-      setError: (msg) => (this.commentSubmitErrorByPostId[postId] = msg),
-      /* errore invio SOLO di quel post */
-
-      actionLabel: 'invio commento',
-      /* etichetta per buildHttpErrorMessage */
-
-      onSuccess: (created) => {
-        /* commento creato correttamente */
-
-        if (!this.commentsByPostId[postId]) {
-          this.commentsByPostId[postId] = [];
-          /* se non avevo mai caricato commenti, creo array */
-        }
-
-        this.commentsByPostId[postId] = [created, ...this.commentsByPostId[postId]];
-        /* aggiungo il nuovo commento in cima */
-
-        this.commentDraftByPostId[postId] = { name: '', email: '', body: '' };
-        /* reset form */
       },
     });
   }

@@ -1,1 +1,51 @@
-<p>posts-list works!</p>
+<!-- pagina lista post -->
+
+<h1>Posts</h1>
+
+<p *ngIf="isLoading">
+  Caricamento post...
+</p>
+<!-- loading -->
+
+<p *ngIf="!isLoading && errorMessage">
+  {{ errorMessage }}
+</p>
+<!-- errore -->
+
+<p *ngIf="!isLoading && !errorMessage && posts.length === 0">
+  Nessun post trovato.
+</p>
+<!-- empty state -->
+
+<table *ngIf="!isLoading && !errorMessage && posts.length > 0" style="width: 100%;">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>User</th>
+      <th>Titolo</th>
+      <th>Azioni</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <ng-container *ngFor="let post of posts">
+      <tr>
+        <td>{{ post.id }}</td>
+        <td>{{ post.user_id }}</td>
+        <td>{{ post.title }}</td>
+        <td>
+          <button type="button" (click)="toggleComments(post.id)">
+            {{ isExpanded(post.id) ? 'Nascondi commenti' : 'Mostra commenti' }}
+          </button>
+        </td>
+      </tr>
+
+      <!-- Riga commenti: DEVE essere un TR con TD colspan -->
+      <tr *ngIf="isExpanded(post.id)">
+        <td colspan="4" style="padding: 12px 0;">
+          <app-post-comments [postId]="post.id"></app-post-comments>
+        </td>
+      </tr>
+    </ng-container>
+  </tbody>
+</table>

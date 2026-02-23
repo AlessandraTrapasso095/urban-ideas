@@ -48,8 +48,7 @@ export class UsersService {
       .set('per_page', String(perPage));
     /* quanti utenti per pagina */
 
-    return this.gorestApi.getUsersWithParams(params, page, perPage);
-    /* uso metodo DRY (paginazione) */
+    return this.gorestApi.getPaginated<User>('users', params, page, perPage);
   }
 
   searchUsers(
@@ -74,9 +73,7 @@ export class UsersService {
       params = params.set(field, cleaned);
       /* aggiungo filtro solo se c'è testo */
     }
-
-    return this.gorestApi.getUsersWithParams(params, page, perPage);
-    /* uso metodo DRY (paginazione) */
+    return this.gorestApi.getPaginated<User>('users', params, page, perPage);
   }
 
   getUserById(id: number): Observable<User> {

@@ -1,4 +1,24 @@
-<!-- contenitore principale: qui Angular carica le pagine in base alle rotte -->
+<!-- HEADER VISIBILE SOLO SE LOGGATA -->
+<mat-toolbar color="primary" *ngIf="isLoggedIn()">
 
+  <span style="font-weight: 500;">Urban Ideas</span>
+
+  <span style="flex: 1 1 auto;"></span>
+  <!-- spacer per spingere i bottoni a destra -->
+
+  <button mat-button [routerLink]="['/users']">
+   Users
+  </button>
+
+  <button mat-button [routerLink]="['/posts']">
+   Posts
+  </button>
+
+  <button mat-button color="warn" (click)="logout()">
+    Logout
+  </button>
+
+</mat-toolbar>
+
+<!-- QUI ANGULAR CARICA LE PAGINE -->
 <router-outlet></router-outlet>
-<!-- vengono renderizzati i componenti delle rotte (login, users, posts) -->
