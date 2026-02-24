@@ -1,3 +1,5 @@
+<!-- componente commenti per un singolo post -->
+
 <p *ngIf="isLoading">Caricamento commenti...</p>
 
 <p *ngIf="!isLoading && errorMessage">
@@ -9,7 +11,7 @@
 </p>
 
 <div *ngIf="!isLoading && !errorMessage && comments.length > 0">
-  <div *ngFor="let c of comments; trackBy: trackByCommentId">
+  <div *ngFor="let c of comments">
     <p><strong>{{ c.name }}</strong> ({{ c.email }})</p>
     <p>{{ c.body }}</p>
     <hr />
@@ -20,12 +22,31 @@
 
 <h3>Aggiungi un commento</h3>
 
-<p *ngIf="submitError">{{ submitError }}</p>
+<p *ngIf="submitError">
+  {{ submitError }}
+</p>
 
 <div style="display: flex; flex-direction: column; gap: 8px; max-width: 420px;">
-  <input type="text" placeholder="Nome" [(ngModel)]="draft.name" />
-  <input type="email" placeholder="Email" [(ngModel)]="draft.email" />
-  <textarea rows="3" placeholder="Scrivi il commento..." [(ngModel)]="draft.body"></textarea>
+  <input
+    type="text"
+    placeholder="Nome"
+    [(ngModel)]="draft.name"
+    name="name-{{ postId }}"
+  />
+
+  <input
+    type="email"
+    placeholder="Email"
+    [(ngModel)]="draft.email"
+    name="email-{{ postId }}"
+  />
+
+  <textarea
+    rows="3"
+    placeholder="Scrivi il commento..."
+    [(ngModel)]="draft.body"
+    name="body-{{ postId }}"
+  ></textarea>
 
   <button type="button" (click)="submit()" [disabled]="isSubmitting">
     {{ isSubmitting ? 'Invio...' : 'Invia commento' }}

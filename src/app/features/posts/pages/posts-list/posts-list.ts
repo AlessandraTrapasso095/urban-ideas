@@ -1,26 +1,26 @@
-/* pagina lista post: qui carico i post da GoREST e li mostro */
+/* pagina lista post: carico i post da GoREST e mostro commenti inline */
 
 import { Component, OnInit, inject } from '@angular/core';
-/* Component = definisco un componente Angular */
-/* OnInit = uso ngOnInit() */
+/* Component = definisco componente
+   OnInit = posso usare ngOnInit */
 
 import { CommonModule } from '@angular/common';
-/* CommonModule = per *ngIf e *ngFor */
+/* CommonModule = *ngIf *ngFor */
 
 import { finalize } from 'rxjs/operators';
-/* finalize = esegue codice sia in caso di successo che errore */
+/* finalize = spengo loading sempre */
 
 import { PostsService } from '../../../users/services/posts.service';
-/* PostsService = chiamate API post */
+/* service API post */
 
-import { Post } from '../../../users/models/gorest-models.model';
-/* tipo Post */
-
-import { buildHttpErrorMessage } from '../../../../core/utils/http-messages';
-/* DRY: messaggi errore standard */
+import { Post, PaginatedResponse } from '../../../users/models/gorest-models.model';
+/* tipi DRY */
 
 import { PostCommentsComponent } from '../../../users/components/post-comments/post-comments';
-/* componente commenti (stesso che usi nella pagina user-detail) */
+/* componente commenti */
+
+import { buildHttpErrorMessage } from '../../../../core/utils/http-messages';
+/* DRY error message */
 
 @Component({
   selector: 'app-posts-list',
@@ -33,59 +33,65 @@ export class PostsList implements OnInit {
   private postsService = inject(PostsService);
 
   posts: Post[] = [];
-  /* lista post mostrati */
 
   isLoading = false;
-  /* loading lista post */
-
   errorMessage = '';
-  /* errore lista post */
+
+  page = 1;
+  pages = 1;
+  perPage = 10;
+  total = 0;
 
   expandedPostId: number | null = null;
   /* ID del post che ha i commenti aperti */
 
   ngOnInit(): void {
-    /* appena entro in pagina, carico i post */
     this.loadPosts();
+    /* appena entro nella pagina carico i post */
   }
 
   loadPosts(): void {
-    /* carico la lista post */
-
     this.isLoading = true;
-    /* accendo loading */
-
     this.errorMessage = '';
-    /* reset errore */
 
     this.postsService
-      .getPosts(1, 10)
-      /* prendo pagina 1, 10 post (poi aggiungiamo paginazione) */
-
+      .getPosts(this.page, this.perPage)
       .pipe(
         finalize(() => {
           this.isLoading = false;
-          /* spengo loading sempre */
         })
       )
       .subscribe({
-        next: (res) => {
-          this.posts = res.data ?? [];
-          /* assegno i post */
+        next: (res: PaginatedResponse<Post>) => {
+          this.posts = res.data;
+          this.page = res.page;
+          this.pages = res.pages;
+          this.total = res.total;
+          this.perPage = res.limit;
         },
         error: (err: unknown) => {
           this.errorMessage = buildHttpErrorMessage('caricamento post', err);
-          /* DRY */
         },
       });
   }
 
   toggleComments(postId: number): void {
-    /* apro/chiudo commenti del post */
     this.expandedPostId = this.expandedPostId === postId ? null : postId;
   }
 
   isExpanded(postId: number): boolean {
     return this.expandedPostId === postId;
+  }
+
+  goPrev(): void {
+    if (this.page <= 1) return;
+    this.page -= 1;
+    this.loadPosts();
+  }
+
+  goNext(): void {
+    if (this.page >= this.pages) return;
+    this.page += 1;
+    this.loadPosts();
   }
 }

@@ -1,21 +1,27 @@
-import {
-  Component,
-  Input,
-  inject,
-  DestroyRef,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  OnChanges,
-  SimpleChanges,
-} from '@angular/core';
+/* componente commenti per un singolo post */
+
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+/* Component = definisco componente
+   Input = ricevo postId
+   OnChanges = reagisco quando cambia postId */
 
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+/* CommonModule = *ngIf *ngFor */
 
-import { PostsService } from '../../../users/services/posts.service';
-import { Comment, CreateCommentDto } from '../../../users/models/gorest-models.model';
+import { FormsModule } from '@angular/forms';
+/* FormsModule = necessario per [(ngModel)] */
+
+import { finalize } from 'rxjs/operators';
+/* finalize = spengo loading sempre */
+
+import { PostsService } from '../../services/posts.service';
+/* chiamo API commenti + creazione commento */
+
+import { Comment, CreateCommentDto } from '../../models/gorest-models.model';
+/* tipi condivisi DRY */
+
 import { buildHttpErrorMessage } from '../../../../core/utils/http-messages';
+/* DRY: messaggi errore standard */
 
 @Component({
   selector: 'app-post-comments',
@@ -23,85 +29,75 @@ import { buildHttpErrorMessage } from '../../../../core/utils/http-messages';
   imports: [CommonModule, FormsModule],
   templateUrl: './post-comments.html',
   styleUrl: './post-comments.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostCommentsComponent implements OnChanges {
-  private postsService = inject(PostsService);
-  private destroyRef = inject(DestroyRef);
-  private cdr = inject(ChangeDetectorRef);
-
   @Input({ required: true }) postId!: number;
+  /* id del post ricevuto dal padre */
+
+  isLoading = false;
+  /* loading commenti */
+
+  errorMessage = '';
+  /* errore commenti */
 
   comments: Comment[] = [];
-  isLoading = false;
-  errorMessage = '';
+  /* lista commenti */
 
   isSubmitting = false;
+  /* loading invio commento */
+
   submitError = '';
+  /* errore invio commento */
 
-  draft: CreateCommentDto = {
-    name: '',
-    email: '',
-    body: '',
-  };
+  draft: CreateCommentDto = { name: '', email: '', body: '' };
+  /* bozza commento */
 
-  trackByCommentId(_: number, c: Comment): number {
-    return c.id;
+  constructor(private postsService: PostsService) {
+    /* inietto PostsService per chiamare API commenti */
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (!changes['postId']) return;
+    /* quando cambia postId ricarico i commenti */
 
-    const id = Number(this.postId);
-    if (!id || id <= 0) return;
+    if (changes['postId']) {
+      const id = Number(this.postId);
 
-    // IMPORTANTISSIMO: rimando il load ad un MACROTASK
-    // così evitiamo NG0100 in dev mode
-    setTimeout(() => this.loadComments(), 0);
+      if (!id || id <= 0) {
+        this.comments = [];
+        this.errorMessage = 'Post non valido.';
+        return;
+      }
+
+      this.loadComments();
+    }
   }
 
-  private setLoading(value: boolean): void {
-    this.isLoading = value;
-    this.cdr.markForCheck();
-  }
+  private loadComments(): void {
+    /* carico commenti del post */
 
-  loadComments(): void {
-    const id = Number(this.postId);
-    if (!id || id <= 0) return;
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.comments = [];
 
-    // Metto isLoading=true in macrotask
-    setTimeout(() => {
-      this.comments = [];
-      this.errorMessage = '';
-      this.setLoading(true);
-
-      this.postsService
-        .getPostComments(id)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe({
-          next: (items: Comment[]) => {
-            // Anche l'update finale in macrotask
-            setTimeout(() => {
-              this.comments = items ?? [];
-              this.setLoading(false);
-            }, 0);
-          },
-          error: (err: any) => {
-            setTimeout(() => {
-              this.comments = [];
-              this.errorMessage = buildHttpErrorMessage('caricamento commenti', err);
-              this.setLoading(false);
-            }, 0);
-          },
-        });
-    }, 0);
+    this.postsService
+      .getPostComments(this.postId)
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe({
+        next: (items: Comment[]) => {
+          this.comments = items ?? [];
+        },
+        error: (err: unknown) => {
+          this.errorMessage = buildHttpErrorMessage('caricamento commenti', err);
+        },
+      });
   }
 
   submit(): void {
-    const id = Number(this.postId);
-    if (!id || id <= 0) return;
-
-    this.submitError = '';
+    /* invio commento */
 
     const dto: CreateCommentDto = {
       name: this.draft.name.trim(),
@@ -111,31 +107,26 @@ export class PostCommentsComponent implements OnChanges {
 
     if (!dto.name || !dto.email || !dto.body) {
       this.submitError = 'Compila tutti i campi.';
-      this.cdr.markForCheck();
       return;
     }
 
     this.isSubmitting = true;
-    this.cdr.markForCheck();
+    this.submitError = '';
 
     this.postsService
-      .createComment(id, dto)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .createComment(this.postId, dto)
+      .pipe(
+        finalize(() => {
+          this.isSubmitting = false;
+        })
+      )
       .subscribe({
         next: (created: Comment) => {
-          setTimeout(() => {
-            this.isSubmitting = false;
-            this.comments = [created, ...this.comments];
-            this.draft = { name: '', email: '', body: '' };
-            this.cdr.markForCheck();
-          }, 0);
+          this.comments = [created, ...this.comments];
+          this.draft = { name: '', email: '', body: '' };
         },
-        error: (err: any) => {
-          setTimeout(() => {
-            this.isSubmitting = false;
-            this.submitError = buildHttpErrorMessage('invio commento', err);
-            this.cdr.markForCheck();
-          }, 0);
+        error: (err: unknown) => {
+          this.submitError = buildHttpErrorMessage('invio commento', err);
         },
       });
   }

@@ -14,7 +14,7 @@ import { map } from 'rxjs/operators';
 /* trasformo la response (header + body) in un oggetto più comodo */
 
 import { PaginatedResponse } from '../../features/users/models/gorest-models.model';
-/* importo SOLO il tipo paginato (DRY) */
+/* tipo paginazione condiviso (generico) */
 
 @Injectable({
   providedIn: 'root',
@@ -53,7 +53,7 @@ export class GorestApiService {
 
     return {
       data: res.body ?? [],
-      /* body = array di dati */
+      /* body = array di elementi */
 
       page: pageHeader,
       pages: pagesHeader,
@@ -62,25 +62,29 @@ export class GorestApiService {
     };
   }
 
-  getPaginatedWithParams<T>(
-    endpoint: string,
+  getPaginated<T>(
+    resource: 'users' | 'posts',
     params: HttpParams,
     page: number,
     perPage: number
   ): Observable<PaginatedResponse<T>> {
-    /* metodo DRY GENERICO:
-       fa la GET su endpoint e mappa gli header di paginazione */
+    /* metodo DRY: fa la GET e mappa gli header di paginazione */
 
     return this.http
-      .get<T[]>(`${this.baseUrl}/${endpoint}`, {
-        params,
-        observe: 'response',
-      })
+      .get<T[]>(`${this.baseUrl}/${resource}`, { params, observe: 'response' })
       /* faccio GET osservando tutta la response per leggere gli header */
 
-      .pipe(
-        map((res: HttpResponse<T[]>) => this.mapPaginatedResponse<T>(res, page, perPage))
-      );
+      .pipe(map((res: HttpResponse<T[]>) => this.mapPaginatedResponse<T>(res, page, perPage)));
       /* trasformo HttpResponse<T[]> in PaginatedResponse<T> */
+  }
+
+  getUsersWithParams(
+    params: HttpParams,
+    page: number,
+    perPage: number
+  ): Observable<PaginatedResponse<any>> {
+    /* compatibilità: se già lo usi da UsersService puoi lasciarlo */
+
+    return this.getPaginated<any>('users', params, page, perPage);
   }
 }

@@ -1,21 +1,20 @@
-<!-- pagina lista post -->
-
 <h1>Posts</h1>
 
-<p *ngIf="isLoading">
-  Caricamento post...
-</p>
-<!-- loading -->
+<p *ngIf="isLoading">Caricamento post...</p>
 
 <p *ngIf="!isLoading && errorMessage">
   {{ errorMessage }}
 </p>
-<!-- errore -->
 
 <p *ngIf="!isLoading && !errorMessage && posts.length === 0">
   Nessun post trovato.
 </p>
-<!-- empty state -->
+
+<div *ngIf="!isLoading && !errorMessage && posts.length > 0" style="margin: 12px 0;">
+  <button type="button" (click)="goPrev()" [disabled]="page <= 1">Prev</button>
+  <span style="margin: 0 12px;">Pagina {{ page }} / {{ pages }} (Totale: {{ total }})</span>
+  <button type="button" (click)="goNext()" [disabled]="page >= pages">Next</button>
+</div>
 
 <table *ngIf="!isLoading && !errorMessage && posts.length > 0" style="width: 100%;">
   <thead>
