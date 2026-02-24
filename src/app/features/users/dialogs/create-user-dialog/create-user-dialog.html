@@ -1,8 +1,13 @@
-<h2 mat-dialog-title>{{ title }}</h2>
+<h2 mat-dialog-title class="dialog-title">{{ title }}</h2>
 <!-- titolo del dialog -->
 
-<div mat-dialog-content>
+<div mat-dialog-content class="dialog-content">
   <!-- contenuto principale del dialog -->
+
+  <p class="dialog-subtitle">
+    Inserisci i dati dell'utente e salva per aggiornare subito la lista.
+  </p>
+  <!-- sottotitolo descrittivo coerente con lo stile delle card -->
 
   <form [formGroup]="form" class="form">
     <!-- collego questo form al reactive form definito in TypeScript -->
@@ -37,29 +42,33 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full">
-      <mat-label>Genere</mat-label>
-      <mat-select formControlName="gender">
-        <!-- collego la select al controllo 'gender' -->
+    <div class="grid-two">
+      <!-- metto le select in 2 colonne su desktop per una finestra più ordinata -->
 
-        <mat-option *ngFor="let g of genders" [value]="g">
-          {{ g }}
-        </mat-option>
-        <!-- genero le opzioni -->
-      </mat-select>
-    </mat-form-field>
+      <mat-form-field appearance="outline" class="half">
+        <mat-label>Genere</mat-label>
+        <mat-select formControlName="gender">
+          <!-- collego la select al controllo 'gender' -->
 
-    <mat-form-field appearance="outline" class="full">
-      <mat-label>Status</mat-label>
-      <mat-select formControlName="status">
-        <!-- collego la select al controllo 'status' -->
+          <mat-option *ngFor="let g of genders" [value]="g">
+            {{ g }}
+          </mat-option>
+          <!-- genero le opzioni -->
+        </mat-select>
+      </mat-form-field>
 
-        <mat-option *ngFor="let s of statuses" [value]="s">
-          {{ s }}
-        </mat-option>
-        <!-- genero le opzioni -->
-      </mat-select>
-    </mat-form-field>
+      <mat-form-field appearance="outline" class="half">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <!-- collego la select al controllo 'status' -->
+
+          <mat-option *ngFor="let s of statuses" [value]="s">
+            {{ s }}
+          </mat-option>
+          <!-- genero le opzioni -->
+        </mat-select>
+      </mat-form-field>
+    </div>
 
     <p *ngIf="errorMessage" class="error">
      {{ errorMessage }}
@@ -68,17 +77,17 @@
   </form>
 </div>
 
-<div mat-dialog-actions align="end">
+<div mat-dialog-actions align="end" class="dialog-actions">
   <!-- area bottoni -->
 
-  <button mat-button type="button" (click)="cancel()" [disabled]="isSubmitting">
+  <button mat-button class="btn-cancel" type="button" (click)="cancel()" [disabled]="isSubmitting">
    Annulla
   </button>
   <!-- disabilito annulla durante invio, per evitare stati strani -->
 
   <button
     mat-flat-button
-    color="primary"
+    class="btn-confirm"
     type="button"
     (click)="submit()"
     [disabled]="isSubmitting || form.invalid"

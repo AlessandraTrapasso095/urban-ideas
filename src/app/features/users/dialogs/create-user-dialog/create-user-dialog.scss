@@ -1,17 +1,105 @@
+:host {
+  display: block;
+}
+
+.dialog-title {
+  margin: 0;
+  font-family: 'Sora', 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #0f2841;
+}
+
+.dialog-content {
+  width: min(680px, 92vw);
+  max-width: 100%;
+  min-width: 0;
+  padding-top: 8px;
+  overflow-x: hidden;
+}
+/* elimino il taglio orizzontale e rendo il dialog responsive */
+
+.dialog-subtitle {
+  margin: 0 0 12px;
+  color: var(--ui-ink-soft);
+  font-weight: 600;
+}
+
 .form {
   display: grid;
   gap: 12px;
-  padding-top: 8px;
 }
-/* layout semplice e pulito: campi uno sotto l'altro */
+/* layout ordinato con spaziatura coerente */
 
-.full {
+.grid-two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.full,
+.half {
   width: 100%;
 }
-/* i form-field occupano tutta la larghezza */
+/* i form-field occupano tutta la colonna disponibile */
+
+.dialog-actions {
+  padding-top: 12px;
+  gap: 10px;
+}
+
+.btn-cancel {
+  border-radius: 10px;
+}
+
+.btn-confirm {
+  border-radius: 11px;
+  color: #0f2438 !important;
+  background: linear-gradient(120deg, #ffd27a, #ffb96f) !important;
+  font-weight: 700;
+  box-shadow: 0 8px 18px rgba(28, 93, 154, 0.18);
+}
+
+.btn-confirm:hover {
+  transform: translateY(-1px);
+}
 
 .error {
   margin: 8px 0 0 0;
-  color: #b00020;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: #7b2331;
+  background: rgba(255, 127, 127, 0.16);
+  border: 1px solid rgba(197, 87, 108, 0.28);
+  font-weight: 600;
 }
-/* stile semplice per messaggio errore */
+/* errore nello stesso stile dei messaggi globali */
+
+:host ::ng-deep .mat-mdc-dialog-surface {
+  border-radius: 18px !important;
+  border: 1px solid var(--ui-border);
+  background:
+    linear-gradient(170deg, rgba(255, 255, 255, 0.92), rgba(241, 248, 255, 0.9)),
+    radial-gradient(circle at 12% 0%, rgba(73, 173, 255, 0.2), transparent 40%);
+  box-shadow: 0 22px 40px rgba(12, 32, 56, 0.22);
+}
+/* superficie dialog allineata al look glass della pagina */
+
+:host ::ng-deep .mat-mdc-dialog-content {
+  margin: 0 !important;
+}
+
+:host ::ng-deep .mat-mdc-dialog-actions {
+  margin: 0 !important;
+}
+
+@media (max-width: 720px) {
+  .dialog-content {
+    width: min(94vw, 620px);
+  }
+
+  .grid-two {
+    grid-template-columns: 1fr;
+  }
+  /* su mobile torno a 1 colonna per evitare tagli */
+}

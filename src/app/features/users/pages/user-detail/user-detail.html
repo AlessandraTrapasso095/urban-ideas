@@ -1,63 +1,68 @@
 <!-- pagina dettaglio utente -->
 
-<h1>Dettaglio utente</h1>
+<section class="page-shell user-detail-page">
+  <div class="glass-card detail-card">
+    <h1>Dettaglio utente</h1>
 
-<p *ngIf="isLoading">
-  Caricamento...
-</p>
-<!-- loading -->
+    <div *ngIf="isLoading" class="loading-wrap">
+      <span class="ui-spinner" aria-hidden="true"></span>
+    </div>
+    <!-- spinner caricamento utente -->
+    <!-- loading -->
 
-<p *ngIf="!isLoading && errorMessage">
-  {{ errorMessage }}
-</p>
-<!-- errore -->
+    <p *ngIf="!isLoading && errorMessage" class="status-msg error">
+      {{ errorMessage }}
+    </p>
+    <!-- errore -->
 
-<div *ngIf="!isLoading && !errorMessage && user">
-  <p><strong>ID:</strong> {{ user.id }}</p>
-  <p><strong>Nome:</strong> {{ user.name }}</p>
-  <p><strong>Email:</strong> {{ user.email }}</p>
-  <p><strong>Gender:</strong> {{ user.gender }}</p>
-  <p><strong>Status:</strong> {{ user.status }}</p>
-</div>
-<!-- dettagli utente: li mostro solo se user esiste e non sto caricando e non ho errori -->
+    <div *ngIf="!isLoading && !errorMessage && user" class="user-data">
+      <p><strong>ID:</strong> {{ user.id }}</p>
+      <p><strong>Nome:</strong> {{ user.name }}</p>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <p><strong>Gender:</strong> {{ user.gender }}</p>
+      <p class="status-line">
+        <strong>Status:</strong>
+        <span
+          class="status-dot"
+          [class.is-active]="user.status === 'active'"
+          [class.is-inactive]="user.status !== 'active'"
+          [matTooltip]="statusLabel(user.status)"
+          matTooltipPosition="above"
+          matTooltipShowDelay="120"
+          [attr.aria-label]="statusLabel(user.status)"
+        ></span>
+        <!-- tooltip Material in overlay: stile coerente con la lista utenti -->
+      </p>
+    </div>
 
-<p *ngIf="!isLoading && !errorMessage && !user">
-  Nessun dato utente disponibile.
-</p>
-<!-- caso “vuoto”: caricamento finito, nessun errore, ma user è null -->
-
-<hr />
-
-<h2>Post dell'utente</h2>
-
-<p *ngIf="postsLoading">
-  Caricamento post...
-</p>
-<!-- loading post -->
-
-<p *ngIf="!postsLoading && postsError">
-  {{ postsError }}
-</p>
-<!-- errore post -->
-
-<p *ngIf="!postsLoading && !postsError && posts.length === 0">
-  Nessun post trovato.
-</p>
-<!-- nessun post: caricamento finito e nessun errore -->
-
-<div *ngIf="!postsLoading && !postsError && posts.length > 0">
-  <!-- lista post: la mostro solo quando ho almeno 1 post -->
-
-  <div
-    *ngFor="let post of posts"
-    style="border: 1px solid #ddd; padding: 12px; margin-bottom: 12px;"
-  >
-    <p><strong>Titolo:</strong> {{ post.title }}</p>
-    <p><strong>Testo:</strong> {{ post.body }}</p>
-
-    <app-post-comments [postId]="post.id"></app-post-comments>
-    <!-- componente figlio: gestisce apertura, caricamento, lista e invio commenti -->
+    <p *ngIf="!isLoading && !errorMessage && !user" class="status-msg empty">
+      Nessun dato utente disponibile.
+    </p>
   </div>
-</div>
 
-<hr />
+  <div class="glass-card posts-card">
+    <h2>Post dell'utente</h2>
+
+    <div *ngIf="postsLoading" class="loading-wrap">
+      <span class="ui-spinner" aria-hidden="true"></span>
+    </div>
+    <!-- spinner caricamento post utente -->
+
+    <p *ngIf="!postsLoading && postsError" class="status-msg error">
+      {{ postsError }}
+    </p>
+
+    <p *ngIf="!postsLoading && !postsError && posts.length === 0" class="status-msg empty">
+      Nessun post trovato.
+    </p>
+
+    <div *ngIf="!postsLoading && !postsError && posts.length > 0" class="post-list">
+      <article *ngFor="let post of posts" class="post-box">
+        <p><strong>Titolo:</strong> {{ post.title }}</p>
+        <p><strong>Testo:</strong> {{ post.body }}</p>
+
+        <app-post-comments [postId]="post.id"></app-post-comments>
+      </article>
+    </div>
+  </div>
+</section>

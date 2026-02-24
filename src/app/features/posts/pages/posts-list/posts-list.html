@@ -1,53 +1,88 @@
-<h1>Posts</h1>
+<section class="page-shell posts-page">
+  <div class="glass-card posts-card">
+    <header class="posts-header">
+      <h1>Posts</h1>
+      <p>Esplora contenuti pubblicati dalla community e interagisci con i commenti.</p>
+    </header>
 
-<!-- LOADING -->
-<div *ngIf="isLoading">
-  Caricamento post...
-</div>
+    <!-- TOOLBAR FILTRI -->
+    <div class="posts-toolbar">
+      <input type="text" placeholder="Cerca per titolo..." [(ngModel)]="searchText" class="search-input" />
 
-<!-- ERRORE -->
-<div *ngIf="!isLoading && errorMessage">
-  {{ errorMessage }}
-</div>
+      <button type="button" class="btn-search" (click)="applySearch()">Cerca</button>
 
-<!-- EMPTY STATE -->
-<div *ngIf="!isLoading && !errorMessage && posts.length === 0">
-  Nessun post trovato.
-</div>
+      <button type="button" class="btn-reset" (click)="resetFilters()">Reset</button>
 
-<!-- LISTA -->
-<div *ngIf="!isLoading && !errorMessage && posts.length > 0">
-  <div style="margin: 12px 0;">
-    <button (click)="goPrev()">Prev</button>
-    <span style="margin: 0 10px;">
-      Pagina {{ page }} / {{ pages }} (Totale: {{ total }})
-    </span>
-    <button (click)="goNext()">Next</button>
+      <label for="per-page-select">Risultati</label>
+      <select id="per-page-select" [(ngModel)]="perPage" (change)="onPerPageChange()">
+        <option [ngValue]="10">10</option>
+        <option [ngValue]="20">20</option>
+        <option [ngValue]="50">50</option>
+      </select>
+
+      <button type="button" class="btn-create" (click)="openCreatePostDialog()">Nuovo post</button>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="isLoading" class="loading-wrap">
+      <span class="ui-spinner" aria-hidden="true"></span>
+    </div>
+    <!-- spinner caricamento post -->
+
+    <!-- ERRORE -->
+    <div *ngIf="!isLoading && errorMessage" class="status-msg error">{{ errorMessage }}</div>
+
+    <!-- EMPTY STATE -->
+    <div *ngIf="!isLoading && !errorMessage && posts.length === 0" class="status-msg empty">
+      Nessun post trovato.
+    </div>
+
+    <!-- LISTA -->
+    <div *ngIf="!isLoading && !errorMessage && posts.length > 0">
+      <p *ngIf="isSearchMode" class="filter-active">Filtro attivo: "{{ searchText.trim() }}"</p>
+
+      <div class="posts-pagination">
+        <button type="button" (click)="goPrev()" [disabled]="page <= 1">Prev</button>
+        <span>Pagina {{ page }} / {{ pages }} (Totale: {{ total }})</span>
+        <button type="button" (click)="goNext()" [disabled]="page >= pages">Next</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="posts-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>User</th>
+              <th>Titolo</th>
+              <th>Azioni</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <ng-container *ngFor="let post of posts; trackBy: trackByPostId">
+              <tr>
+                <td>{{ post.id }}</td>
+                <td>{{ post.user_id }}</td>
+                <td>{{ post.title }}</td>
+                <td>
+                  <button type="button" class="toggle-btn" (click)="toggleComments(post.id)">
+                    {{ isExpanded(post.id) ? 'Nascondi commenti' : 'Mostra commenti' }}
+                  </button>
+                </td>
+              </tr>
+
+              <tr *ngIf="isExpanded(post.id)" class="expanded-row">
+                <td colspan="4">
+                  <p><strong>Testo post:</strong></p>
+                  <p>{{ post.body }}</p>
+
+                  <app-post-comments [postId]="post.id"></app-post-comments>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
-
-  <table border="1" cellpadding="8" cellspacing="0" width="100%">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>User</th>
-        <th>Titolo</th>
-        <th>Azioni</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      <tr *ngFor="let post of posts">
-        <td>{{ post.id }}</td>
-        <td>{{ post.user_id }}</td>
-        <td>{{ post.title }}</td>
-        <td>
-          <button (click)="toggleComments(post.id)">
-            {{ isExpanded(post.id) ? 'Nascondi commenti' : 'Mostra commenti' }}
-          </button>
-        </td>
-      </tr>
-
-      <!-- qui sotto (step successivo) potremo mostrare i commenti davvero -->
-    </tbody>
-  </table>
-</div>
+</section>

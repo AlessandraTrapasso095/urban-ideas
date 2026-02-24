@@ -1,1 +1,67 @@
-/* stile base della pagina dettaglio utente */
+.user-detail-page {
+  display: grid;
+  gap: 16px;
+}
+
+.detail-card,
+.posts-card {
+  display: grid;
+  gap: 12px;
+}
+
+.user-data {
+  display: grid;
+  gap: 8px;
+
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--ui-border);
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.user-data p {
+  margin: 0;
+}
+
+.status-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  position: relative;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
+  cursor: help;
+}
+
+.status-dot.is-active {
+  background: #23b56e;
+}
+
+.status-dot.is-inactive {
+  background: #e0525f;
+}
+
+.post-list {
+  display: grid;
+  gap: 12px;
+}
+
+.post-box {
+  border: 1px solid var(--ui-border);
+  border-radius: 14px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.64);
+
+  transition: transform 170ms ease, box-shadow 170ms ease;
+}
+
+.post-box:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(22, 59, 92, 0.14);
+}

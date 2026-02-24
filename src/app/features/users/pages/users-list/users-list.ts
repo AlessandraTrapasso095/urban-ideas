@@ -34,6 +34,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 /* bottoni Material */
 
+import { MatTooltipModule } from '@angular/material/tooltip';
+/* tooltip Material in overlay: evita che il testo venga tagliato nella tabella */
+
 import { FormsModule } from '@angular/forms';
 /* FormsModule = necessario per usare [(ngModel)] */
 
@@ -55,6 +58,9 @@ import { RouterModule } from '@angular/router';
 import { buildHttpErrorMessage } from '../../../../core/utils/http-messages';
 /* DRY: messaggi errore standard */
 
+import { getStatusLabel } from '../../utils/status-label';
+/* DRY: helper condiviso per etichetta status */
+
 @Component({
   selector: 'app-users-list',
   standalone: true,
@@ -68,6 +74,7 @@ import { buildHttpErrorMessage } from '../../../../core/utils/http-messages';
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
+    MatTooltipModule,
     MatDialogModule,
     RouterModule,
   ],
@@ -92,6 +99,9 @@ export class UsersList implements OnInit {
 
   readonly displayedColumns: string[] = ['id', 'name', 'email', 'status', 'actions'];
   /* colonne mostrate nella tabella */
+
+  readonly statusLabel = getStatusLabel;
+  /* DRY: espongo helper al template per tooltip/aria-label */
 
   searchText = '';
   /* testo digitato dall’utente */
@@ -137,7 +147,9 @@ export class UsersList implements OnInit {
     /* apro dialog di creazione */
 
     const dialogRef = this.dialog.open(CreateUserDialog, {
-      width: '520px',
+      width: 'min(680px, 92vw)',
+      maxWidth: '92vw',
+      /* dialog più ampio e responsive: evita campi tagliati */
       disableClose: true,
     });
 
@@ -159,7 +171,9 @@ export class UsersList implements OnInit {
   /* apro dialog in modalità edit */
 
   const dialogRef = this.dialog.open(CreateUserDialog, {
-    width: '520px',
+    width: 'min(680px, 92vw)',
+    maxWidth: '92vw',
+    /* stessa misura del create: UI coerente tra crea e modifica */
     disableClose: true,
     data: { user },
     /* passo l'utente da modificare */

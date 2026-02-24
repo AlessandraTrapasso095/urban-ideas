@@ -19,6 +19,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../../../core/services/auth.service';
 /* importo AuthService per salvare/leggere il token */
 
+const GOREST_TOKEN_PATTERN = /^[A-Za-z0-9_-]{30,}$/;
+/* pattern "ragionevole" per token API:
+   almeno 30 caratteri alfanumerici (più _ e -) */
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -43,8 +47,12 @@ export class Login {
     nonNullable: true,
     /* così tokenControl.value è sempre una stringa (mai null) */
 
-    validators: [Validators.required],
-    /* obbligo l'utente a inserire qualcosa */
+    validators: [
+      Validators.required,
+      Validators.pattern(GOREST_TOKEN_PATTERN),
+    ],
+    /* required = token obbligatorio
+       pattern = formato token plausibile */
   });
 
   constructor(
@@ -65,8 +73,18 @@ export class Login {
       return;
     }
 
-    const token = this.tokenControl.value.trim();
-    /* prendo il valore e tolgo spazi iniziali/finali */
+    const rawToken = this.tokenControl.value.trim();
+    /* leggo valore inserito e rimuovo spazi esterni */
+
+    const token = rawToken.replace(/^Bearer\s+/i, '').trim();
+    /* se l'utente incolla "Bearer <token>", tengo solo il token */
+
+    if (!GOREST_TOKEN_PATTERN.test(token)) {
+      /* validazione finale difensiva (DRY col pattern sopra) */
+      this.tokenControl.setErrors({ tokenFormat: true });
+      this.tokenControl.markAsTouched();
+      return;
+    }
 
     this.authService.setToken(token);
     /* salvo token nel localStorage tramite AuthService */

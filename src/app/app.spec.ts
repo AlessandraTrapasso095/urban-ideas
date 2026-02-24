@@ -1,3 +1,5 @@
+/* test base componente root */
+
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
 
@@ -9,12 +11,14 @@ describe('App', () => {
   });
 
   it('should create the app', () => {
+    /* creo componente root */
     const fixture = TestBed.createComponent(App);
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
   });
 
   it('should render router-outlet', async () => {
+    /* verifico che il template abbia outlet per le pagine */
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;

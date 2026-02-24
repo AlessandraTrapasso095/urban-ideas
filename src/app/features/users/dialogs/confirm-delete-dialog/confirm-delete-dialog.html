@@ -1,18 +1,20 @@
+<!-- dialog conferma eliminazione -->
+
 <h2 mat-dialog-title>Conferma eliminazione</h2>
 <!-- titolo del dialog -->
 
-<div mat-dialog-content>
+<div mat-dialog-content class="confirm-content">
   <!-- contenuto -->
 
   <p>
     Vuoi davvero eliminare questo utente
-    <strong *ngIf="data?.name">{{ data.name }}</strong
-    ><span *ngIf="!data?.name">?</span>
+    <strong *ngIf="data.name">{{ data.name }}</strong
+    ><span *ngIf="!data.name">?</span>
   </p>
   <!-- mostro il nome se lo ho -->
 </div>
 
-<div mat-dialog-actions align="end">
+<div mat-dialog-actions align="end" class="confirm-actions">
   <!-- area bottoni -->
 
   <button mat-button type="button" (click)="cancel()">
@@ -20,7 +22,7 @@
   </button>
   <!-- chiudo via codice -->
 
-  <button mat-flat-button color="warn" type="button" (click)="confirm()">
+  <button mat-flat-button class="btn-delete" type="button" (click)="confirm()">
     Elimina
   </button>
   <!-- chiudo via codice -->

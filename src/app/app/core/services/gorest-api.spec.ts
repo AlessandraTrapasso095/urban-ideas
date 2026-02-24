@@ -1,13 +1,18 @@
+/* test base gorest api service */
+
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 
-import { GorestApi } from './gorest-api';
+import { GorestApiService } from '../../../core/services/gorest-api';
 
-describe('GorestApi', () => {
-  let service: GorestApi;
+describe('GorestApiService', () => {
+  let service: GorestApiService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(GorestApi);
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient()],
+    });
+    service = TestBed.inject(GorestApiService);
   });
 
   it('should be created', () => {

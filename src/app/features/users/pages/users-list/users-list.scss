@@ -1,20 +1,142 @@
-/* stile base per la pagina lista utenti */
-
-table {
-  width: 100%;
+.users-page {
+  display: grid;
+  gap: 16px;
 }
 
-h1 {
-  margin: 0 0 16px 0;
+.users-card {
+  display: grid;
+  gap: 14px;
+}
+
+.users-header p {
+  margin: 0;
+  color: var(--ui-ink-soft);
 }
 
 .users-toolbar {
   display: flex;
   gap: 12px;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
 }
 
 .users-toolbar mat-form-field {
-  min-width: 220px;
+  min-width: 210px;
+}
+
+.users-toolbar button {
+  margin-top: 10px;
+}
+/* allineo verticalmente i bottoni al centro dei riquadri input/select */
+
+.users-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(63, 141, 255, 0.08);
+}
+
+.btn-search,
+.btn-create {
+  border-radius: 11px;
+  transition: transform 170ms ease, box-shadow 170ms ease;
+}
+
+.btn-search {
+  color: #fff !important;
+  background: linear-gradient(120deg, var(--ui-brand-a), var(--ui-brand-b)) !important;
+}
+
+.btn-create {
+  color: #0f2438 !important;
+  background: linear-gradient(120deg, #ffd27a, #ffb96f) !important;
+}
+
+.btn-search:hover,
+.btn-create:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(28, 93, 154, 0.22);
+}
+
+.btn-reset {
+  border-radius: 11px;
+}
+
+.table-wrap {
+  overflow: auto;
+  border-radius: 14px;
+  border: 1px solid var(--ui-border);
+}
+
+.users-table {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.users-table .mat-mdc-header-row {
+  background: rgba(36, 106, 173, 0.1);
+}
+
+.users-table .mat-mdc-row {
+  transition: background-color 160ms ease;
+}
+
+.users-table .mat-mdc-row:hover {
+  background: rgba(49, 140, 205, 0.08);
+}
+
+.users-table .status-header,
+.users-table .status-cell {
+  text-align: center;
+}
+/* centro la colonna status così il pallino sta sotto la label "Status" */
+
+.users-table .status-cell {
+  vertical-align: middle;
+}
+
+.name-link {
+  font-weight: 700;
+  color: #1c5f9e;
+}
+
+.actions-cell {
+  white-space: nowrap;
+}
+
+.status-dot {
+  position: relative;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
+  cursor: help;
+}
+
+.status-dot.is-active {
+  background: #23b56e;
+}
+
+.status-dot.is-inactive {
+  background: #e0525f;
+}
+
+@media (max-width: 860px) {
+  .users-pagination {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .users-toolbar mat-form-field {
+    min-width: 100%;
+  }
+
+  .users-toolbar button {
+    margin-top: 0;
+  }
 }

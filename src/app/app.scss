@@ -1,5 +1,145 @@
-mat-toolbar {
+:host {
+  display: block;
+}
+
+.app-toolbar {
   position: sticky;
   top: 0;
   z-index: 1000;
+
+  min-height: 102px;
+  padding: 12px 18px;
+
+  background:
+    linear-gradient(120deg, rgba(7, 18, 45, 0.93), rgba(21, 56, 86, 0.9)),
+    radial-gradient(circle at 20% 0%, rgba(39, 168, 255, 0.35), transparent 45%);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 12px 32px rgba(4, 8, 19, 0.26);
+
+  backdrop-filter: blur(8px);
+}
+
+.header-logo-btn {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  line-height: 0;
+  margin-left: 26px;
+  /* sposto il logo verso destra per allinearlo al centro del titolo sotto */
+}
+
+.header-logo {
+  height: 84px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+
+  transition: transform 200ms ease, filter 200ms ease;
+}
+
+.header-logo-btn:hover .header-logo {
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-brand-title {
+  color: #f7fbff;
+  font-family: 'Sora', 'Space Grotesk', sans-serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-btn {
+  min-height: 44px;
+  padding: 0 16px !important;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f7fbff !important;
+  transition: transform 180ms ease, background-color 180ms ease;
+}
+
+.nav-btn:hover {
+  transform: translateY(-1px);
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
+.logout-btn {
+  min-height: 46px;
+  padding: 0 20px !important;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0b1f32 !important;
+  background: linear-gradient(120deg, #ffcc66, #ff9f68) !important;
+  box-shadow: 0 8px 20px rgba(255, 152, 88, 0.35);
+}
+
+.app-main {
+  padding: 4px 18px 30px;
+}
+
+@media (max-width: 720px) {
+  .app-toolbar {
+    min-height: 112px;
+    padding: 10px 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .header-logo {
+    height: 74px;
+  }
+
+  .header-logo-btn {
+    margin-left: 16px;
+    /* mantengo allineamento anche su mobile */
+  }
+
+  .header-brand {
+    gap: 8px;
+  }
+
+  .header-brand-title {
+    font-size: 1.45rem;
+  }
+
+  .toolbar-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .nav-btn {
+    min-height: 40px;
+    padding: 0 14px !important;
+  }
+
+  .logout-btn {
+    min-height: 42px;
+    padding: 0 16px !important;
+  }
+
+  .app-main {
+    padding: 4px 12px 22px;
+  }
 }

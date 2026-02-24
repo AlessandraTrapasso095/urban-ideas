@@ -45,6 +45,18 @@ export class App {
     return this.authService.isLoggedIn();
   }
 
+  goHome(): void {
+    /* logo cliccabile:
+       se loggata vado alla pagina principale utenti,
+       altrimenti torno al login */
+    if (this.authService.isLoggedIn()) {
+      this.router.navigateByUrl('/users');
+      return;
+    }
+
+    this.router.navigateByUrl('/auth');
+  }
+
   logout(): void {
     /* cancello token */
     this.authService.logout();

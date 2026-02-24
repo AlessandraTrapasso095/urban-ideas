@@ -1,14 +1,102 @@
-.form {
+.login-shell {
+  min-height: calc(100vh - 180px);
   display: grid;
-  gap: 12px;
-  padding-top: 8px;
+  place-items: center;
 }
 
-.full {
+.login-wrap {
+  width: min(520px, 100%);
+  display: grid;
+  justify-items: center;
+  margin-inline: auto;
+  gap: 12px;
+}
+/* wrapper unico: brand sopra e card sotto sempre centrati */
+
+.login-brand {
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  transform: translateX(12px);
+}
+/* offset ottico: il png ha spazio trasparente e sembra spostato a sinistra */
+
+.login-logo {
+  width: 192px;
+  height: 192px;
+  object-fit: contain;
+  display: block;
+}
+
+.login-brand-name {
+  margin: 0;
+  color: #0d2236;
+  font-family: 'Sora', 'Space Grotesk', sans-serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.login-card {
+  width: 100%;
+  margin: 0 auto;
+  padding: 28px;
+
+  position: relative;
+  overflow: hidden;
+}
+
+.login-card::before {
+  content: '';
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(42, 185, 245, 0.32), transparent 70%);
+  top: -40px;
+  right: -30px;
+}
+
+.login-head {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 8px;
+}
+
+.login-head h1 {
+  margin-bottom: 8px;
+}
+
+.login-head p {
+  margin: 0;
+  color: var(--ui-ink-soft);
+}
+
+.full-width {
   width: 100%;
 }
 
-.error {
-  margin: 8px 0 0 0;
-  color: #b00020;
+.login-btn {
+  width: 100%;
+  margin-top: 10px;
+
+  border-radius: 12px;
+  font-weight: 700;
+
+  color: #0f2234 !important;
+  background: linear-gradient(120deg, var(--ui-accent), #ffd36f) !important;
+
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.login-btn:hover:not(:disabled) {
+  transform: translateY(-1px) scale(1.03);
+  box-shadow: 0 10px 22px rgba(255, 178, 90, 0.35);
+}
+
+@media (max-width: 720px) {
+  .login-brand {
+    transform: translateX(8px);
+  }
 }

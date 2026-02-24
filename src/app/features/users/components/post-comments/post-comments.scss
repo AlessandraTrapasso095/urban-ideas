@@ -1,1 +1,86 @@
-/* stile base commenti: puoi lasciarlo vuoto per ora */
+.comments-shell {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.comment-list {
+  display: grid;
+  gap: 8px;
+}
+
+.comment-item {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--ui-border);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.comment-author {
+  margin: 0;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.comment-author span {
+  color: var(--ui-ink-soft);
+  font-size: 0.9rem;
+}
+
+.comment-body {
+  margin: 6px 0 0;
+}
+
+.comment-form-wrap {
+  margin-top: 4px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--ui-border);
+  background: rgba(240, 247, 255, 0.76);
+}
+
+.comment-form-wrap h3 {
+  margin-bottom: 10px;
+}
+
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 480px;
+}
+
+.comment-form input,
+.comment-form textarea {
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  color: #15304c;
+  background: rgba(255, 255, 255, 0.93);
+}
+
+.comment-form button {
+  align-self: flex-start;
+  border: 0;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font: inherit;
+  font-weight: 700;
+
+  color: #fff;
+  background: linear-gradient(120deg, #2a78cf, #2fb7de);
+
+  cursor: pointer;
+  transition: transform 160ms ease, opacity 160ms ease;
+}
+
+.comment-form button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.comment-form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -2,3 +2,18 @@ p {
   margin: 0;
 }
 /* reset semplice */
+
+.confirm-content {
+  min-width: min(420px, 78vw);
+}
+
+.confirm-actions {
+  padding-top: 12px;
+}
+
+.btn-delete {
+  border-radius: 10px;
+  font-weight: 700;
+  color: #fff !important;
+  background: linear-gradient(120deg, #d14f5f, #ef6e6e) !important;
+}

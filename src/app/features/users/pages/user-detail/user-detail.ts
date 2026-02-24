@@ -7,6 +7,9 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 /* CommonModule = mi serve per *ngIf e *ngFor */
 
+import { MatTooltipModule } from '@angular/material/tooltip';
+/* tooltip Material in overlay: mantiene il testo sempre leggibile */
+
 import { ActivatedRoute } from '@angular/router';
 /* leggo parametro :id dall'URL */
 
@@ -31,6 +34,9 @@ import { buildHttpErrorMessage } from '../../../../core/utils/http-messages';
 
 import { PostCommentsComponent } from '../../components/post-comments/post-comments';
 
+import { getStatusLabel } from '../../utils/status-label';
+/* DRY: helper condiviso per etichetta status */
+
 @Component({
   selector: 'app-user-detail',
   standalone: true,
@@ -38,6 +44,9 @@ import { PostCommentsComponent } from '../../components/post-comments/post-comme
   imports: [
     CommonModule,
     /* abilito direttive base nel template */
+
+    MatTooltipModule,
+    /* tooltip Material per i pallini status */
 
     PostCommentsComponent,
     /* componente figlio che gestisce commenti */
@@ -67,6 +76,9 @@ export class UserDetail implements OnInit {
 
   postsError = '';
   /* errore post */
+
+  readonly statusLabel = getStatusLabel;
+  /* DRY: espongo helper al template per tooltip/aria-label */
 
   constructor(
     private route: ActivatedRoute,

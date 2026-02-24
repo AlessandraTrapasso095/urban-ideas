@@ -1,21 +1,19 @@
-/* test base per PostsService */
+/* test unitari per PostsService */
 
 import { TestBed } from '@angular/core/testing';
-/* TestBed = crea modulo di test Angular */
-
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-/* HttpClientTestingModule = mock HttpClient */
-/* HttpTestingController = intercetto chiamate HTTP */
+import { HttpParams } from '@angular/common/http';
+import { of } from 'rxjs';
+import { vi } from 'vitest';
 
 import { PostsService } from './posts.service';
-/* service da testare */
-
 import { GorestApiService } from '../../../core/services/gorest-api';
-/* dipendenza che fornisce baseUrl */
+import { CreateCommentDto, CreatePostDto } from '../models/gorest-models.model';
 
 describe('PostsService', () => {
   let service: PostsService;
   let httpMock: HttpTestingController;
+  let gorestApi: GorestApiService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -25,28 +23,101 @@ describe('PostsService', () => {
 
     service = TestBed.inject(PostsService);
     httpMock = TestBed.inject(HttpTestingController);
+    gorestApi = TestBed.inject(GorestApiService);
   });
 
   afterEach(() => {
     httpMock.verify();
-    /* verifico che non restino chiamate pendenti */
+    /* verifico che non restino richieste appese */
   });
 
   it('should create', () => {
     expect(service).toBeTruthy();
   });
 
-  it('getPostComments should call correct url', () => {
-    service.getPostComments(10).subscribe();
-    /* avvio la chiamata */
+  it('getPosts should call gorestApi.getPaginated with posts resource', () => {
+    const paginatedSpy = vi.spyOn(gorestApi, 'getPaginated').mockReturnValue(
+      of({ data: [], page: 1, pages: 1, total: 0, limit: 10 })
+    );
 
-    const req = httpMock.expectOne((r) => r.url.includes('/posts/10/comments'));
-    /* intercetto richiesta */
+    service.getPosts(1, 10).subscribe();
 
+    expect(paginatedSpy).toHaveBeenCalledTimes(1);
+    expect(paginatedSpy.mock.calls[0][0]).toBe('posts');
+    expect(paginatedSpy.mock.calls[0][1]).toEqual(
+      expect.any(HttpParams)
+    );
+  });
+
+  it('searchPosts should set title param when search exists', () => {
+    const paginatedSpy = vi.spyOn(gorestApi, 'getPaginated').mockReturnValue(
+      of({ data: [], page: 1, pages: 1, total: 0, limit: 10 })
+    );
+
+    service.searchPosts('ambiente', 1, 10).subscribe();
+
+    const params = paginatedSpy.mock.calls[0][1] as HttpParams;
+    expect(params.get('title')).toBe('ambiente');
+  });
+
+  it('searchPosts should not set title param when search is blank', () => {
+    const paginatedSpy = vi.spyOn(gorestApi, 'getPaginated').mockReturnValue(
+      of({ data: [], page: 1, pages: 1, total: 0, limit: 10 })
+    );
+
+    service.searchPosts('   ', 1, 10).subscribe();
+
+    const params = paginatedSpy.mock.calls[0][1] as HttpParams;
+    expect(params.get('title')).toBeNull();
+  });
+
+  it('getUserPosts should call GET /users/:id/posts', () => {
+    service.getUserPosts(8).subscribe();
+
+    const req = httpMock.expectOne('https://gorest.co.in/public/v2/users/8/posts');
     expect(req.request.method).toBe('GET');
-    /* controllo metodo */
 
     req.flush([]);
-    /* rispondo con array vuoto */
+  });
+
+  it('getPostComments should call GET /posts/:id/comments', () => {
+    service.getPostComments(10).subscribe();
+
+    const req = httpMock.expectOne('https://gorest.co.in/public/v2/posts/10/comments');
+    expect(req.request.method).toBe('GET');
+
+    req.flush([]);
+  });
+
+  it('createComment should call POST /posts/:id/comments with payload', () => {
+    const dto: CreateCommentDto = {
+      name: 'Anna',
+      email: 'anna@example.com',
+      body: 'Bel progetto!',
+    };
+
+    service.createComment(11, dto).subscribe();
+
+    const req = httpMock.expectOne('https://gorest.co.in/public/v2/posts/11/comments');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(dto);
+
+    req.flush({ id: 1, ...dto });
+  });
+
+  it('createPost should call POST /posts with payload', () => {
+    const dto: CreatePostDto = {
+      user_id: 3,
+      title: 'Nuova idea urbana',
+      body: 'Testo del post',
+    };
+
+    service.createPost(dto).subscribe();
+
+    const req = httpMock.expectOne('https://gorest.co.in/public/v2/posts');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(dto);
+
+    req.flush({ id: 99, ...dto });
   });
 });
