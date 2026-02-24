@@ -29,7 +29,7 @@ import { buildHttpErrorMessage } from '../../../../core/utils/http-messages';
   templateUrl: './posts-list.html',
   styleUrl: './posts-list.scss',
 })
-export class PostsList implements OnInit {
+export class PostListComponent implements OnInit {
   private postsService = inject(PostsService);
 
   posts: Post[] = [];

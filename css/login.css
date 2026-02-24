@@ -1,0 +1,14 @@
+.form {
+  display: grid;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.full {
+  width: 100%;
+}
+
+.error {
+  margin: 8px 0 0 0;
+  color: #b00020;
+}/*# sourceMappingURL=login.css.map */

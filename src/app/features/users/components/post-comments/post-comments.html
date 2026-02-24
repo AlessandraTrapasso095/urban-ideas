@@ -11,7 +11,7 @@
 </p>
 
 <div *ngIf="!isLoading && !errorMessage && comments.length > 0">
-  <div *ngFor="let c of comments">
+  <div *ngFor="let c of comments; trackBy: trackByCommentId">
     <p><strong>{{ c.name }}</strong> ({{ c.email }})</p>
     <p>{{ c.body }}</p>
     <hr />
@@ -22,9 +22,7 @@
 
 <h3>Aggiungi un commento</h3>
 
-<p *ngIf="submitError">
-  {{ submitError }}
-</p>
+<p *ngIf="submitError">{{ submitError }}</p>
 
 <div style="display: flex; flex-direction: column; gap: 8px; max-width: 420px;">
   <input

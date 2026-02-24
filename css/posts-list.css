@@ -1,0 +1,33 @@
+/* stile base per la pagina posts */
+table {
+  width: 100%;
+}
+
+h1 {
+  margin: 0 0 16px 0;
+}
+
+.posts-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.posts-toolbar mat-form-field {
+  min-width: 220px;
+}
+
+.posts-pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.comments-inline {
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+}/*# sourceMappingURL=posts-list.css.map */
