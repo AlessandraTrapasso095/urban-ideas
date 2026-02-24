@@ -84,3 +84,31 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+@media (max-width: 730px) {
+  .comment-form {
+    max-width: 100%;
+  }
+
+  .comment-author {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .comment-form button {
+    width: 100%;
+    align-self: stretch;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .comment-form-wrap {
+    padding: 10px;
+  }
+
+  .comment-item {
+    padding: 9px 10px;
+  }
+}

@@ -1,38 +1,62 @@
-<!-- pagina dettaglio utente -->
+<!-- pagina dettaglio utente in stile profilo + feed -->
 
 <section class="page-shell user-detail-page">
-  <div class="glass-card detail-card">
-    <h1>Dettaglio utente</h1>
-
+  <div class="glass-card profile-card">
     <div *ngIf="isLoading" class="loading-wrap">
       <span class="ui-spinner" aria-hidden="true"></span>
     </div>
     <!-- spinner caricamento utente -->
-    <!-- loading -->
 
     <p *ngIf="!isLoading && errorMessage" class="status-msg error">
       {{ errorMessage }}
     </p>
-    <!-- errore -->
+    <!-- errore caricamento utente -->
 
-    <div *ngIf="!isLoading && !errorMessage && user" class="user-data">
-      <p><strong>ID:</strong> {{ user.id }}</p>
-      <p><strong>Nome:</strong> {{ user.name }}</p>
-      <p><strong>Email:</strong> {{ user.email }}</p>
-      <p><strong>Gender:</strong> {{ user.gender }}</p>
-      <p class="status-line">
-        <strong>Status:</strong>
-        <span
-          class="status-dot"
-          [class.is-active]="user.status === 'active'"
-          [class.is-inactive]="user.status !== 'active'"
-          [matTooltip]="statusLabel(user.status)"
-          matTooltipPosition="above"
-          matTooltipShowDelay="120"
-          [attr.aria-label]="statusLabel(user.status)"
-        ></span>
-        <!-- tooltip Material in overlay: stile coerente con la lista utenti -->
-      </p>
+    <div *ngIf="!isLoading && !errorMessage && user" class="profile-shell">
+      <header class="profile-head">
+        <span class="profile-avatar" aria-hidden="true">
+          {{ getUserInitial(user.name) }}
+        </span>
+
+        <div class="profile-meta">
+          <h1>{{ user.name }}</h1>
+          <p class="profile-subtitle">Profilo utente</p>
+        </div>
+      </header>
+
+      <section class="profile-info-grid">
+        <article class="info-item">
+          <p class="info-label">ID</p>
+          <p class="info-value">{{ user.id }}</p>
+        </article>
+
+        <article class="info-item">
+          <p class="info-label">Email</p>
+          <p class="info-value">{{ user.email }}</p>
+        </article>
+
+        <article class="info-item">
+          <p class="info-label">Genere</p>
+          <p class="info-value">{{ user.gender }}</p>
+        </article>
+
+        <article class="info-item">
+          <p class="info-label">Stato</p>
+          <p class="info-value status-value">
+            <span
+              class="ui-status-dot"
+              [class.is-active]="user.status === 'active'"
+              [class.is-inactive]="user.status !== 'active'"
+              [matTooltip]="statusLabel(user.status)"
+              matTooltipPosition="above"
+              matTooltipShowDelay="120"
+              [attr.aria-label]="statusLabel(user.status)"
+            ></span>
+            <span>{{ statusLabel(user.status) }}</span>
+          </p>
+          <!-- tooltip Material in overlay: leggibile anche dentro card -->
+        </article>
+      </section>
     </div>
 
     <p *ngIf="!isLoading && !errorMessage && !user" class="status-msg empty">
@@ -40,8 +64,11 @@
     </p>
   </div>
 
-  <div class="glass-card posts-card">
-    <h2>Post dell'utente</h2>
+  <div class="glass-card user-feed-card">
+    <header class="user-feed-header">
+      <h2>Post utente</h2>
+      <p>Feed dei contenuti pubblicati da questo profilo.</p>
+    </header>
 
     <div *ngIf="postsLoading" class="loading-wrap">
       <span class="ui-spinner" aria-hidden="true"></span>
@@ -56,13 +83,34 @@
       Nessun post trovato.
     </p>
 
-    <div *ngIf="!postsLoading && !postsError && posts.length > 0" class="post-list">
-      <article *ngFor="let post of posts" class="post-box">
-        <p><strong>Titolo:</strong> {{ post.title }}</p>
-        <p><strong>Testo:</strong> {{ post.body }}</p>
+    <section *ngIf="!postsLoading && !postsError && posts.length > 0" class="user-feed-list">
+      <article *ngFor="let post of posts; trackBy: trackByPostId" class="user-feed-post">
+        <header class="user-feed-post-head">
+          <div class="user-feed-author">
+            <span class="author-avatar" aria-hidden="true">
+              {{ getUserInitial(user?.name) }}
+            </span>
 
-        <app-post-comments [postId]="post.id"></app-post-comments>
+            <div>
+              <p class="author-name">{{ user?.name }}</p>
+              <p class="author-id">ID utente: {{ post.user_id }}</p>
+            </div>
+          </div>
+
+          <button type="button" class="comment-toggle-btn" (click)="toggleComments(post.id)">
+            {{ isExpanded(post.id) ? 'Nascondi commenti' : 'Commenti' }}
+          </button>
+        </header>
+
+        <div class="user-feed-content">
+          <h3>{{ post.title }}</h3>
+          <p>{{ post.body }}</p>
+        </div>
+
+        <section *ngIf="isExpanded(post.id)" class="user-feed-comments">
+          <app-post-comments [postId]="post.id"></app-post-comments>
+        </section>
       </article>
-    </div>
+    </section>
   </div>
 </section>

@@ -1,10 +1,14 @@
+/* verifico caricamento feed, ricerca, paginazione, azioni dialog e toggle interazioni post */
+
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
+import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 
 import { PostListComponent } from './posts-list';
 import { PostsService } from '../../../users/services/posts.service';
+import { UsersService } from '../../../users/services/users.service';
 import { Post } from '../../../users/models/gorest-models.model';
 
 describe('PostListComponent', () => {
@@ -24,6 +28,11 @@ describe('PostListComponent', () => {
     getPostComments: vi.fn(),
     createComment: vi.fn(),
     createPost: vi.fn(),
+    updatePost: vi.fn(),
+  };
+
+  const usersServiceMock = {
+    getUserById: vi.fn(),
   };
 
   const dialogMock = {
@@ -43,10 +52,16 @@ describe('PostListComponent', () => {
       afterClosed: () => of(undefined),
     });
 
+    usersServiceMock.getUserById.mockReturnValue(
+      of({ id: 2, name: 'Utente Test', email: 'test@example.com', gender: 'female', status: 'active' })
+    );
+
     await TestBed.configureTestingModule({
       imports: [PostListComponent],
       providers: [
+        provideRouter([]),
         { provide: PostsService, useValue: postsServiceMock },
+        { provide: UsersService, useValue: usersServiceMock },
         { provide: MatDialog, useValue: dialogMock },
       ],
     }).compileComponents();
@@ -151,6 +166,16 @@ describe('PostListComponent', () => {
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
+  it('goPrev should do nothing when already on first page', () => {
+    const spy = vi.spyOn(component, 'loadPosts').mockImplementation(() => {});
+    component.page = 1;
+
+    component.goPrev();
+
+    expect(component.page).toBe(1);
+    expect(spy).not.toHaveBeenCalled();
+  });
+
   it('goNext should increment page and call loadPosts', () => {
     const spy = vi.spyOn(component, 'loadPosts').mockImplementation(() => {});
     component.page = 1;
@@ -160,6 +185,17 @@ describe('PostListComponent', () => {
 
     expect(component.page).toBe(2);
     expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('goNext should do nothing when already on last page', () => {
+    const spy = vi.spyOn(component, 'loadPosts').mockImplementation(() => {});
+    component.page = 4;
+    component.pages = 4;
+
+    component.goNext();
+
+    expect(component.page).toBe(4);
+    expect(spy).not.toHaveBeenCalled();
   });
 
   it('applySearch should reset page and expanded state then call loadPosts', () => {
@@ -219,5 +255,44 @@ describe('PostListComponent', () => {
     expect(component.page).toBe(1);
     expect(component.expandedPostId).toBeNull();
     expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('openEditPostDialog should reload list when dialog returns updated post', () => {
+    const spy = vi.spyOn(component, 'loadPosts').mockImplementation(() => {});
+
+    dialogMock.open.mockReturnValueOnce({
+      afterClosed: () => of({ ...samplePost, title: 'Titolo aggiornato' }),
+    });
+
+    component.expandedPostId = 10;
+    component.openEditPostDialog(samplePost);
+
+    expect(component.expandedPostId).toBeNull();
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('openEditPostDialog should not reload list when dialog returns undefined', () => {
+    const spy = vi.spyOn(component, 'loadPosts').mockImplementation(() => {});
+
+    dialogMock.open.mockReturnValueOnce({
+      afterClosed: () => of(undefined),
+    });
+
+    component.openEditPostDialog(samplePost);
+
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('toggleLike should add and remove post id from local set', () => {
+    component.toggleLike(10);
+    expect(component.isLiked(10)).toBe(true);
+
+    component.toggleLike(10);
+    expect(component.isLiked(10)).toBe(false);
+  });
+
+  it('getAuthorName should use fallback when cache is empty', () => {
+    const label = component.getAuthorName(samplePost);
+    expect(label).toBe('Utente #2');
   });
 });

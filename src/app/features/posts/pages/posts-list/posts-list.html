@@ -1,12 +1,28 @@
+<!-- pagina dei post: con ricerca, filtri, azioni e pannello commenti -->
 <section class="page-shell posts-page">
   <div class="glass-card posts-card">
     <header class="posts-header">
-      <h1>Posts</h1>
-      <p>Esplora contenuti pubblicati dalla community e interagisci con i commenti.</p>
+      <div class="posts-header-copy">
+        <h1>Post</h1>
+        <p>Feed della community: leggi, commenta e aggiorna i contenuti urbani.</p>
+      </div>
+
+      <button
+        type="button"
+        class="header-create-btn"
+        (click)="openCreatePostDialog()"
+        matTooltip="Aggiungi post"
+        matTooltipPosition="above"
+        matTooltipShowDelay="120"
+        aria-label="Aggiungi post"
+      >
+        +
+      </button>
+
     </header>
 
-    <!-- TOOLBAR FILTRI -->
-    <div class="posts-toolbar">
+    <!-- toolbar filtri + azioni principali -->
+    <div class="feed-toolbar">
       <input type="text" placeholder="Cerca per titolo..." [(ngModel)]="searchText" class="search-input" />
 
       <button type="button" class="btn-search" (click)="applySearch()">Cerca</button>
@@ -19,26 +35,23 @@
         <option [ngValue]="20">20</option>
         <option [ngValue]="50">50</option>
       </select>
-
-      <button type="button" class="btn-create" (click)="openCreatePostDialog()">Nuovo post</button>
     </div>
 
-    <!-- LOADING -->
+    <!-- loading -->
     <div *ngIf="isLoading" class="loading-wrap">
       <span class="ui-spinner" aria-hidden="true"></span>
     </div>
-    <!-- spinner caricamento post -->
 
-    <!-- ERRORE -->
+    <!-- errore -->
     <div *ngIf="!isLoading && errorMessage" class="status-msg error">{{ errorMessage }}</div>
 
-    <!-- EMPTY STATE -->
+    <!-- empty state -->
     <div *ngIf="!isLoading && !errorMessage && posts.length === 0" class="status-msg empty">
       Nessun post trovato.
     </div>
 
-    <!-- LISTA -->
-    <div *ngIf="!isLoading && !errorMessage && posts.length > 0">
+    <!-- feed post in stile social -->
+    <div *ngIf="!isLoading && !errorMessage && posts.length > 0" class="feed-shell">
       <p *ngIf="isSearchMode" class="filter-active">Filtro attivo: "{{ searchText.trim() }}"</p>
 
       <div class="posts-pagination">
@@ -47,42 +60,53 @@
         <button type="button" (click)="goNext()" [disabled]="page >= pages">Next</button>
       </div>
 
-      <div class="table-wrap">
-        <table class="posts-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>User</th>
-              <th>Titolo</th>
-              <th>Azioni</th>
-            </tr>
-          </thead>
+      <section class="feed-list">
+        <article *ngFor="let post of posts; trackBy: trackByPostId" class="feed-card">
+          <header class="feed-card-head">
+            <div class="author-block">
+              <span class="author-avatar" aria-hidden="true">{{ getAuthorInitial(post) }}</span>
 
-          <tbody>
-            <ng-container *ngFor="let post of posts; trackBy: trackByPostId">
-              <tr>
-                <td>{{ post.id }}</td>
-                <td>{{ post.user_id }}</td>
-                <td>{{ post.title }}</td>
-                <td>
-                  <button type="button" class="toggle-btn" (click)="toggleComments(post.id)">
-                    {{ isExpanded(post.id) ? 'Nascondi commenti' : 'Mostra commenti' }}
-                  </button>
-                </td>
-              </tr>
+              <div class="author-meta">
+                <a class="author-name-link" [routerLink]="['/users', post.user_id]">
+                  {{ getAuthorName(post) }}
+                </a>
+                <!-- cliccando sul nome apro il dettaglio utente senza reload pagina -->
+                <p class="author-id">ID utente: {{ post.user_id }}</p>
+              </div>
+            </div>
 
-              <tr *ngIf="isExpanded(post.id)" class="expanded-row">
-                <td colspan="4">
-                  <p><strong>Testo post:</strong></p>
-                  <p>{{ post.body }}</p>
+            <button type="button" class="edit-post-btn" (click)="openEditPostDialog(post)">
+              Modifica
+            </button>
+          </header>
 
-                  <app-post-comments [postId]="post.id"></app-post-comments>
-                </td>
-              </tr>
-            </ng-container>
-          </tbody>
-        </table>
-      </div>
+          <div class="feed-content">
+            <h2>{{ post.title }}</h2>
+            <p>{{ post.body }}</p>
+          </div>
+
+          <div class="feed-actions">
+            <button
+              type="button"
+              class="action-btn like-btn"
+              [class.is-liked]="isLiked(post.id)"
+              (click)="toggleLike(post.id)"
+            >
+              <span class="material-icons" aria-hidden="true">thumb_up</span>
+              <span>{{ isLiked(post.id) ? 'Ti piace' : 'Mi piace' }}</span>
+            </button>
+
+            <button type="button" class="action-btn comment-btn" (click)="toggleComments(post.id)">
+              <span class="material-icons" aria-hidden="true">chat_bubble</span>
+              <span>{{ isExpanded(post.id) ? 'Nascondi commenti' : 'Commenti' }}</span>
+            </button>
+          </div>
+
+          <section *ngIf="isExpanded(post.id)" class="feed-comments-panel">
+            <app-post-comments [postId]="post.id"></app-post-comments>
+          </section>
+        </article>
+      </section>
     </div>
   </div>
 </section>

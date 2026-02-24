@@ -120,4 +120,20 @@ describe('PostsService', () => {
 
     req.flush({ id: 99, ...dto });
   });
+
+  it('updatePost should call PUT /posts/:id with payload', () => {
+    const dto: CreatePostDto = {
+      user_id: 3,
+      title: 'Titolo aggiornato',
+      body: 'Testo aggiornato',
+    };
+
+    service.updatePost(99, dto).subscribe();
+
+    const req = httpMock.expectOne('https://gorest.co.in/public/v2/posts/99');
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual(dto);
+
+    req.flush({ id: 99, ...dto });
+  });
 });

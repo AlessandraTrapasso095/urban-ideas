@@ -19,6 +19,8 @@ import { PostsService } from '../../services/posts.service';
 import { Comment, CreateCommentDto } from '../../models/gorest-models.model';
 
 import { buildHttpErrorMessage } from '../../../../core/utils/http-messages';
+import { runInAngular } from '../../../../core/utils/run-in-angular';
+/* DRY: utility condivisa per update stato + detectChanges */
 
 @Component({
   selector: 'app-post-comments',
@@ -56,7 +58,7 @@ export class PostCommentsComponent implements OnChanges {
       const id = Number(this.postId);
 
       if (!id || id <= 0) {
-        this.runInAngular(() => {
+        runInAngular(this.ngZone, this.cdr, () => {
           this.comments = [];
           this.isLoading = false;
           this.errorMessage = 'Post non valido.';
@@ -73,7 +75,7 @@ export class PostCommentsComponent implements OnChanges {
   }
 
   private loadComments(postId: number): void {
-    this.runInAngular(() => {
+    runInAngular(this.ngZone, this.cdr, () => {
       this.isLoading = true;
       this.errorMessage = '';
       this.comments = [];
@@ -84,13 +86,13 @@ export class PostCommentsComponent implements OnChanges {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (items: Comment[]) => {
-          this.runInAngular(() => {
+          runInAngular(this.ngZone, this.cdr, () => {
             this.comments = Array.isArray(items) ? items : [];
             this.isLoading = false;
           });
         },
         error: (err: unknown) => {
-          this.runInAngular(() => {
+          runInAngular(this.ngZone, this.cdr, () => {
             this.comments = [];
             this.isLoading = false;
             this.errorMessage = buildHttpErrorMessage('caricamento commenti', err);
@@ -112,13 +114,13 @@ export class PostCommentsComponent implements OnChanges {
     };
 
     if (!dto.name || !dto.email || !dto.body) {
-      this.runInAngular(() => {
+      runInAngular(this.ngZone, this.cdr, () => {
         this.submitError = 'Compila tutti i campi.';
       });
       return;
     }
 
-    this.runInAngular(() => {
+    runInAngular(this.ngZone, this.cdr, () => {
       this.isSubmitting = true;
     });
 
@@ -127,28 +129,18 @@ export class PostCommentsComponent implements OnChanges {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (created: Comment) => {
-          this.runInAngular(() => {
+          runInAngular(this.ngZone, this.cdr, () => {
             this.isSubmitting = false;
             this.comments = [created, ...this.comments];
             this.draft = { name: '', email: '', body: '' };
           });
         },
         error: (err: unknown) => {
-          this.runInAngular(() => {
+          runInAngular(this.ngZone, this.cdr, () => {
             this.isSubmitting = false;
             this.submitError = buildHttpErrorMessage('invio commento', err);
           });
         },
       });
-  }
-
-  private runInAngular(fn: () => void): void {
-    /* utility DRY:
-       1) eseguo aggiornamenti nel contesto Angular
-       2) forzo refresh vista (utile con OnPush) */
-    this.ngZone.run(() => {
-      fn();
-      this.cdr.detectChanges();
-    });
   }
 }

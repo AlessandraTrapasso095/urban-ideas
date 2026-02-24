@@ -3,7 +3,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 
-import { GorestApiService } from '../../../core/services/gorest-api';
+import { GorestApiService } from './gorest-api';
 
 describe('GorestApiService', () => {
   let service: GorestApiService;

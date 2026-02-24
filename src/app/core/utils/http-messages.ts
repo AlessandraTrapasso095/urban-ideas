@@ -1,10 +1,9 @@
+/* utility messaggi errore HTTP: crea testi coerenti in tutta l'app partendo da action + status code */
+
 import { getHttpStatus } from './http-error';
 /* riuso utility che estrae lo status dagli errori HTTP */
 
-/**
- * Costruisce messaggi errore coerenti e DRY.
- * action = testo tipo "caricamento utenti", "creazione utente", ecc.
- */
+
 export function buildHttpErrorMessage(action: string, err: unknown): string {
   const status = getHttpStatus(err);
   /* estraggo status in modo safe */

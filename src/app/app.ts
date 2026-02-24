@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 /* Component = definisco il componente root */
 
-import { RouterOutlet, RouterLink, Router } from '@angular/router';
+import { RouterOutlet, RouterLink, Router, RouterLinkActive } from '@angular/router';
 /* RouterOutlet = punto dove vengono caricate le pagine */
 /* RouterLink = per creare link nel template */
+/* RouterLinkActive = mi aiuta a evidenziare la sezione attiva */
 /* Router = per fare redirect nel logout */
 
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -11,6 +12,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 
 import { MatButtonModule } from '@angular/material/button';
 /* bottoni Material */
+import { MatTooltipModule } from '@angular/material/tooltip';
+/* tooltip Material per mostrare etichetta su hover */
 
 import { CommonModule } from '@angular/common';
 /* mi serve per *ngIf */
@@ -25,8 +28,10 @@ import { AuthService } from './core/services/auth.service';
   imports: [
     RouterOutlet,
     RouterLink,
+    RouterLinkActive,
     MatToolbarModule,
     MatButtonModule,
+    MatTooltipModule,
     CommonModule,
   ],
 

@@ -10,8 +10,8 @@
   justify-items: center;
   margin-inline: auto;
   gap: 12px;
+  padding-inline: 8px;
 }
-/* wrapper unico: brand sopra e card sotto sempre centrati */
 
 .login-brand {
   width: 100%;
@@ -20,7 +20,6 @@
   gap: 6px;
   transform: translateX(12px);
 }
-/* offset ottico: il png ha spazio trasparente e sembra spostato a sinistra */
 
 .login-logo {
   width: 192px;
@@ -95,8 +94,66 @@
   box-shadow: 0 10px 22px rgba(255, 178, 90, 0.35);
 }
 
+@media (max-width: 960px) {
+  .login-shell {
+    min-height: calc(100vh - 150px);
+  }
+
+  .login-logo {
+    width: 164px;
+    height: 164px;
+  }
+
+  .login-brand-name {
+    font-size: 2.4rem;
+  }
+}
+
 @media (max-width: 720px) {
+  .login-wrap {
+    width: min(460px, 100%);
+    gap: 10px;
+    padding-inline: 4px;
+  }
+
   .login-brand {
-    transform: translateX(8px);
+    transform: none;
+    gap: 4px;
+  }
+
+  .login-logo {
+    width: 140px;
+    height: 140px;
+  }
+
+  .login-brand-name {
+    font-size: 2rem;
+  }
+
+  .login-card {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-shell {
+    min-height: calc(100vh - 126px);
+  }
+
+  .login-logo {
+    width: 118px;
+    height: 118px;
+  }
+
+  .login-brand-name {
+    font-size: 1.7rem;
+  }
+
+  .login-card {
+    padding: 16px;
+  }
+
+  .login-head p {
+    font-size: 0.92rem;
   }
 }

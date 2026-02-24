@@ -1,4 +1,4 @@
-/* utility DRY: leggo lo status code da un errore HTTP in modo safe */
+/* leggo lo status code da un errore HTTP in modo safe */
 
 export function getHttpStatus(err: unknown): number | undefined {
   /* err è unknown perché Angular può passarmi qualsiasi cosa in error */

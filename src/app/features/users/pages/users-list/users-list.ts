@@ -61,6 +61,21 @@ import { buildHttpErrorMessage } from '../../../../core/utils/http-messages';
 import { getStatusLabel } from '../../utils/status-label';
 /* DRY: helper condiviso per etichetta status */
 
+import {
+  DIALOG_SIZE_FORM,
+  DIALOG_SIZE_CONFIRM,
+} from '../../../../core/constants/dialog-sizes';
+/* DRY: dimensioni dialog condivise */
+
+import {
+  normalizeSearchText,
+  applyPaginationMeta,
+  goPrevPage,
+  goNextPage,
+  resetToFirstPage,
+} from '../../../../core/utils/pagination';
+/* DRY: helper condivisi per ricerca e paginazione */
+
 @Component({
   selector: 'app-users-list',
   standalone: true,
@@ -147,9 +162,8 @@ export class UsersList implements OnInit {
     /* apro dialog di creazione */
 
     const dialogRef = this.dialog.open(CreateUserDialog, {
-      width: 'min(680px, 92vw)',
-      maxWidth: '92vw',
-      /* dialog più ampio e responsive: evita campi tagliati */
+      ...DIALOG_SIZE_FORM,
+      /* DRY: uso preset dimensioni dialog form */
       disableClose: true,
     });
 
@@ -159,8 +173,8 @@ export class UsersList implements OnInit {
       if (!createdUser) return;
       /* se annullo non faccio nulla */
 
-      this.page = 1;
-      /* torno alla prima pagina */
+      resetToFirstPage(this);
+      /* DRY: torno alla prima pagina */
 
       this.applySearch();
       /* ricarico la lista */
@@ -171,9 +185,8 @@ export class UsersList implements OnInit {
   /* apro dialog in modalità edit */
 
   const dialogRef = this.dialog.open(CreateUserDialog, {
-    width: 'min(680px, 92vw)',
-    maxWidth: '92vw',
-    /* stessa misura del create: UI coerente tra crea e modifica */
+    ...DIALOG_SIZE_FORM,
+    /* DRY: stesso preset del create */
     disableClose: true,
     data: { user },
     /* passo l'utente da modificare */
@@ -211,7 +224,8 @@ export class UsersList implements OnInit {
     /* apro dialog di conferma */
 
     const dialogRef = this.dialog.open(ConfirmDeleteDialog, {
-      width: '420px',
+      ...DIALOG_SIZE_CONFIRM,
+      /* DRY: preset dimensioni dialog conferma */
       disableClose: true,
       data: { name: user.name },
     });
@@ -275,8 +289,8 @@ export class UsersList implements OnInit {
 
   applySearch(): void {
 
-    const cleaned = this.searchText.trim();
-    /* pulisco eventuali spazi */
+    const cleaned = normalizeSearchText(this.searchText);
+    /* DRY: pulisco eventuali spazi con helper condiviso */
 
     this.isLoading = true;
     this.errorMessage = '';
@@ -302,10 +316,8 @@ export class UsersList implements OnInit {
           this.dataSource.data = res.data;
           /* aggiorno tabella */
 
-          this.page = res.page;
-          this.pages = res.pages;
-          this.total = res.total;
-          this.perPage = res.limit;
+          applyPaginationMeta(this, res);
+          /* DRY: sincronizzo metadati paginazione */
         },
         error: (err: unknown) => {
          this.errorMessage = buildHttpErrorMessage('nel caricamento', err);
@@ -318,14 +330,16 @@ export class UsersList implements OnInit {
   ========================== */
 
   goPrev(): void {
-    if (this.page <= 1) return;
-    this.page -= 1;
+    if (!goPrevPage(this)) return;
+    /* DRY: guardia + decremento pagina in un unico helper */
+
     this.applySearch();
   }
 
   goNext(): void {
-    if (this.page >= this.pages) return;
-    this.page += 1;
+    if (!goNextPage(this)) return;
+    /* DRY: guardia + incremento pagina in un unico helper */
+
     this.applySearch();
   }
 
@@ -333,12 +347,14 @@ export class UsersList implements OnInit {
     this.searchText = '';
     this.searchField = 'name';
     this.perPage = 10;
-    this.page = 1;
+    resetToFirstPage(this);
+    /* DRY: reset pagina */
     this.applySearch();
   }
 
   onPerPageChange(): void {
-    this.page = 1;
+    resetToFirstPage(this);
+    /* DRY: reset pagina quando cambia perPage */
     this.applySearch();
   }
 }

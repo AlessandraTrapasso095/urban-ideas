@@ -1,3 +1,5 @@
+/* centralizza baseUrl e gestione risposte leggendo i metadata dagli header HTTP */
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable, map } from 'rxjs';

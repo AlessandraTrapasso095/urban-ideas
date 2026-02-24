@@ -77,6 +77,9 @@ export class UserDetail implements OnInit {
   postsError = '';
   /* errore post */
 
+  expandedPostId: number | null = null;
+  /* id del post utente con pannello commenti aperto */
+
   readonly statusLabel = getStatusLabel;
   /* DRY: espongo helper al template per tooltip/aria-label */
 
@@ -180,6 +183,8 @@ export class UserDetail implements OnInit {
 
     this.user = null;
     /* reset utente */
+    this.expandedPostId = null;
+    /* reset eventuale pannello commenti aperto */
 
     this.runRequest<User>({
       /* uso helper DRY */
@@ -230,7 +235,29 @@ export class UserDetail implements OnInit {
       onSuccess: (posts) => {
         this.posts = posts;
         /* salvo lista post */
+        this.expandedPostId = null;
+        /* al refresh lista richiudo i commenti aperti */
       },
     });
+  }
+
+  getUserInitial(name: string | null | undefined): string {
+    /* ricavo iniziale del nome per avatar stile social */
+    return (name ?? '').trim().charAt(0).toUpperCase() || 'U';
+  }
+
+  trackByPostId(index: number, post: Post): number {
+    /* trackBy: render più stabile nella lista post */
+    return post.id ?? index;
+  }
+
+  toggleComments(postId: number): void {
+    /* click su commenti: apro/chiudo il pannello del singolo post */
+    this.expandedPostId = this.expandedPostId === postId ? null : postId;
+  }
+
+  isExpanded(postId: number): boolean {
+    /* true se il post ha commenti visibili */
+    return this.expandedPostId === postId;
   }
 }

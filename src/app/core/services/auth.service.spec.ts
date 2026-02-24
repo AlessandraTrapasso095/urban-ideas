@@ -1,3 +1,5 @@
+/* test AuthService: verifico salvataggio token, lettura token, stato login e logout */
+
 import { TestBed } from '@angular/core/testing';
 
 import { AuthService } from './auth.service';

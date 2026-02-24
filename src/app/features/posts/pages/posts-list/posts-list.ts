@@ -1,127 +1,114 @@
-/* pagina lista post: carico i post da GoREST e gestisco apertura commenti */
+/* pagina dei post: carico i post da GoREST e li mostro in stile feed */
 
 import { Component, OnInit, inject, ChangeDetectorRef, NgZone } from '@angular/core';
-/* Component = definisco componente Angular
-   OnInit = mi permette di usare ngOnInit */
-
 import { CommonModule } from '@angular/common';
-/* CommonModule = mi serve per *ngIf e *ngFor */
+/* mi serve per *ngIf e *ngFor */
 import { FormsModule } from '@angular/forms';
-/* FormsModule = mi serve per usare [(ngModel)] nella barra filtri */
+/* mi serve per usare [(ngModel)] nella barra filtri */
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-/* MatDialog = apro dialog creazione post
-   MatDialogModule = supporto dialog in componente standalone */
-
-import { finalize, timeout } from 'rxjs';
-/* finalize = spengo loading sempre
-   timeout = evito loading infinito se una chiamata resta appesa */
-
+import { MatTooltipModule } from '@angular/material/tooltip';
+/* tooltip hover per bottone "+" in header */
+import { RouterLink } from '@angular/router';
+import { catchError, finalize, forkJoin, map, of, timeout } from 'rxjs';
 import { PostsService } from '../../../users/services/posts.service';
 /* service che chiama le API dei post */
-
+import { UsersService } from '../../../users/services/users.service';
 import { Post, PaginatedResponse } from '../../../users/models/gorest-models.model';
-/* tipi condivisi (DRY) */
-
 import { PostCommentsComponent } from '../../../users/components/post-comments/post-comments';
-/* componente che mostra i commenti del singolo post */
 import { CreatePostDialog } from '../../dialogs/create-post-dialog/create-post-dialog';
-/* dialog per inserire un nuovo post */
-
 import { buildHttpErrorMessage } from '../../../../core/utils/http-messages';
-/* utility DRY per messaggi errore coerenti */
+import { DIALOG_SIZE_POST_FORM } from '../../../../core/constants/dialog-sizes';
+import { runInAngular } from '../../../../core/utils/run-in-angular';
+import {
+  normalizeSearchText,
+  applyPaginationMeta,
+  goPrevPage,
+  goNextPage,
+  resetToFirstPage,
+} from '../../../../core/utils/pagination';
 
 @Component({
   selector: 'app-posts-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatDialogModule, PostCommentsComponent],
+  imports: [CommonModule, FormsModule, MatDialogModule, MatTooltipModule, RouterLink, PostCommentsComponent],
   templateUrl: './posts-list.html',
   styleUrl: './posts-list.scss',
 })
 export class PostListComponent implements OnInit {
   private postsService = inject(PostsService);
-  /* inject = recupero il service senza constructor */
+  /* recupero il service post */
+  private usersService = inject(UsersService);
+  /* recupero service utenti per ottenere i nomi autore */
   private cdr = inject(ChangeDetectorRef);
-  /* cdr = mi permette di forzare il refresh del template quando serve */
+  /* cdr mi permette di forzare il refresh del template quando serve */
   private ngZone = inject(NgZone);
-  /* ngZone = assicuro che gli update stato girino nel contesto Angular */
+  /* assicuro che gli update stato girino nel contesto Angular */
   private dialog = inject(MatDialog);
-  /* dialog = mi serve per aprire la modale di creazione post */
+  /* mi serve per aprire la modale creazione/modifica post */
 
   private readonly requestTimeoutMs = 10000;
-  /* timeout centrale (10 secondi) per non ripetere numeri magici */
+  /* timeout centrale (10 secondi) */
   private loadingGuardTimerId: ReturnType<typeof setTimeout> | null = null;
-  /* timer di sicurezza UI: evita spinner bloccato se la request resta pending */
+  /* evita spinner bloccato se la request resta pending */
 
   posts: Post[] = [];
   /* array con i post correnti mostrati in pagina */
 
+  authorNameMap: Record<number, string> = {};
+  likedPostIds = new Set<number>();
+
   isLoading = false;
-  /* true mentre sto caricando dati */
-
   errorMessage = '';
-  /* testo errore da mostrare in pagina */
-
   page = 1;
-  /* pagina corrente */
-
   pages = 1;
-  /* numero totale pagine */
-
   perPage = 10;
   /* quanti post per pagina */
 
   total = 0;
   /* numero totale post dal server */
   searchText = '';
-  /* testo ricerca per titolo post */
   isSearchMode = false;
-  /* true quando sto usando filtro ricerca */
 
   expandedPostId: number | null = null;
   /* id del post con sezione commenti aperta */
 
   ngOnInit(): void {
-    /* al mount del componente carico la prima lista post */
+    /* carico la prima lista post */
     this.loadPosts();
   }
 
   loadPosts(): void {
-    /* preparo stato UI prima della chiamata */
     this.isLoading = true;
     this.errorMessage = '';
     this.clearLoadingGuard();
-    /* se avevo un vecchio timer attivo, lo pulisco prima di ripartire */
 
     this.loadingGuardTimerId = setTimeout(() => {
-      /* fallback extra difensivo: se sono ancora in loading, lo spengo */
+      /* se sono ancora in loading, lo spengo */
       if (!this.isLoading) return;
 
-      this.runInAngular(() => {
+      runInAngular(this.ngZone, this.cdr, () => {
         this.isLoading = false;
         this.errorMessage = 'Errore caricamento post (timeout client).';
       });
     }, this.requestTimeoutMs + 1000);
 
-    const cleanSearch = this.searchText.trim();
-    /* pulisco spazi per evitare filtri sporchi */
+    const cleanSearch = normalizeSearchText(this.searchText);
 
     const request$ = cleanSearch
       ? this.postsService.searchPosts(cleanSearch, this.page, this.perPage)
       : this.postsService.getPosts(this.page, this.perPage);
-    /* DRY: scelgo una sola sorgente request in base alla ricerca */
+    /* scelgo una sola sorgente request in base alla ricerca */
 
     this.isSearchMode = !!cleanSearch;
     /* segno se sto usando filtro attivo */
 
     request$
-      /* passo pagina e limite correnti */
       .pipe(
         timeout(this.requestTimeoutMs),
-        /* se il server non risponde entro timeout, vado in errore controllato */
+        /* se il server non risponde entro timeout */
 
         finalize(() => {
-          /* questo blocco gira sempre: success o error */
-          this.runInAngular(() => {
+          runInAngular(this.ngZone, this.cdr, () => {
             this.clearLoadingGuard();
             this.isLoading = false;
           });
@@ -129,42 +116,99 @@ export class PostListComponent implements OnInit {
       )
       .subscribe({
         next: (res: PaginatedResponse<Post>) => {
-          this.runInAngular(() => {
-            /* salvo i dati in modo safe */
+          runInAngular(this.ngZone, this.cdr, () => {
+            /* salvo i dati */
             this.posts = Array.isArray(res.data) ? res.data : [];
 
-            /* aggiorno metadati paginazione dal backend */
-            this.page = res.page;
-            this.pages = res.pages;
-            this.total = res.total;
-            this.perPage = res.limit;
+            applyPaginationMeta(this, res);
           });
+
+          this.hydrateAuthorNames(this.posts);
         },
         error: (err: unknown) => {
-          this.runInAngular(() => {
-            /* costruisco messaggio errore uniforme (DRY) */
+          runInAngular(this.ngZone, this.cdr, () => {
             this.errorMessage = buildHttpErrorMessage('caricamento post', err);
           });
         },
       });
   }
 
-  private runInAngular(fn: () => void): void {
-    /* utility DRY:
-       1) eseguo aggiornamenti dentro Angular zone
-       2) forzo un refresh della view */
-    this.ngZone.run(() => {
-      fn();
-      this.cdr.detectChanges();
-    });
-  }
-
   private clearLoadingGuard(): void {
-    /* utility DRY: pulizia timer di sicurezza per evitare leak */
     if (!this.loadingGuardTimerId) return;
 
     clearTimeout(this.loadingGuardTimerId);
     this.loadingGuardTimerId = null;
+  }
+
+  private hydrateAuthorNames(posts: Post[]): void {
+
+    const uniqueIds = Array.from(
+      new Set(
+        posts
+          .map((post) => Number(post.user_id))
+          .filter((id) => Number.isFinite(id) && id > 0)
+      )
+    );
+
+    const idsToLoad = uniqueIds.filter((id) => !this.authorNameMap[id]);
+    if (idsToLoad.length === 0) return;
+
+    const requests = idsToLoad.map((id) =>
+      this.usersService.getUserById(id).pipe(
+        map((user) => ({
+          id,
+          name: user.name?.trim() || this.buildFallbackAuthorName(id),
+        })),
+        catchError(() =>
+          of({
+            id,
+            name: this.buildFallbackAuthorName(id),
+          })
+        )
+      )
+    );
+
+    forkJoin(requests).subscribe((loadedAuthors) => {
+      runInAngular(this.ngZone, this.cdr, () => {
+        const nextMap: Record<number, string> = { ...this.authorNameMap };
+
+        loadedAuthors.forEach((author) => {
+          nextMap[author.id] = author.name;
+        });
+
+        this.authorNameMap = nextMap;
+      });
+    });
+  }
+
+  private buildFallbackAuthorName(userId: number): string {
+    /* fallback se nome utente non disponibile */
+    return `Utente #${userId}`;
+  }
+
+  getAuthorName(post: Post): string {
+    /* leggo il nome autore dalla cache, altrimenti fallback */
+    return this.authorNameMap[post.user_id] || this.buildFallbackAuthorName(post.user_id);
+  }
+
+  getAuthorInitial(post: Post): string {
+    /* prendo iniziale autore */
+    return this.getAuthorName(post).trim().charAt(0).toUpperCase() || 'U';
+  }
+
+  toggleLike(postId: number): void {
+    /* comportamento like locale: click alterna attivo/non attivo */
+    if (this.likedPostIds.has(postId)) {
+      this.likedPostIds.delete(postId);
+      return;
+    }
+
+    this.likedPostIds.add(postId);
+  }
+
+  isLiked(postId: number): boolean {
+    /* true se il post è nella lista like locale */
+    return this.likedPostIds.has(postId);
   }
 
   toggleComments(postId: number): void {
@@ -173,7 +217,6 @@ export class PostListComponent implements OnInit {
   }
 
   trackByPostId(index: number, post: Post): number {
-    /* trackBy: aiuta Angular a renderizzare righe in modo stabile */
     return post.id ?? index;
   }
 
@@ -183,45 +226,33 @@ export class PostListComponent implements OnInit {
   }
 
   goPrev(): void {
-    /* guardia: se sono già a pagina 1 non faccio nulla */
-    if (this.page <= 1) return;
-
-    this.page -= 1;
-    /* torno alla pagina precedente */
+    if (!goPrevPage(this)) return;
 
     this.loadPosts();
     /* ricarico lista con nuova pagina */
   }
 
   goNext(): void {
-    /* guardia: se sono già all'ultima pagina non faccio nulla */
-    if (this.page >= this.pages) return;
-
-    this.page += 1;
-    /* avanzo alla pagina successiva */
+    if (!goNextPage(this)) return;
 
     this.loadPosts();
-    /* ricarico lista con nuova pagina */
   }
 
   applySearch(): void {
-    /* applico filtro titolo: torno sempre alla prima pagina */
-    this.page = 1;
+    resetToFirstPage(this);
     this.expandedPostId = null;
     this.loadPosts();
   }
 
   resetFilters(): void {
-    /* reset DRY: riporto barra filtri e paginazione ai default */
     this.searchText = '';
-    this.page = 1;
+    resetToFirstPage(this);
     this.expandedPostId = null;
     this.loadPosts();
   }
 
   onPerPageChange(): void {
-    /* quando cambio dimensione pagina riparto da pagina 1 */
-    this.page = 1;
+    resetToFirstPage(this);
     this.expandedPostId = null;
     this.loadPosts();
   }
@@ -229,7 +260,7 @@ export class PostListComponent implements OnInit {
   openCreatePostDialog(): void {
     /* apro dialog creazione post */
     const dialogRef = this.dialog.open(CreatePostDialog, {
-      width: '560px',
+      ...DIALOG_SIZE_POST_FORM,
       disableClose: true,
     });
 
@@ -242,9 +273,28 @@ export class PostListComponent implements OnInit {
          - torno in pagina 1
          - ricarico lista aggiornata */
       this.searchText = '';
-      this.page = 1;
+      resetToFirstPage(this);
       this.expandedPostId = null;
       this.loadPosts();
+    });
+  }
+
+  openEditPostDialog(post: Post): void {
+    const dialogRef = this.dialog.open(CreatePostDialog, {
+      ...DIALOG_SIZE_POST_FORM,
+      disableClose: true,
+      data: { post },
+    });
+
+    dialogRef.afterClosed().subscribe((updatedPost: Post | undefined) => {
+      /* se chiudo senza salvare modifiche, esco */
+      if (!updatedPost) return;
+
+      this.expandedPostId = null;
+      /* richiudo eventuali commenti aperti per evitare mismatch visuale */
+
+      this.loadPosts();
+      /* ricarico la pagina corrente con i dati aggiornati */
     });
   }
 }

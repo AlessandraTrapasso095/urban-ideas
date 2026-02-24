@@ -1,12 +1,12 @@
 /* pagina login: qui inserisco il token GoREST e lo salvo */
 
 import { CommonModule } from '@angular/common';
-/* CommonModule contiene direttive base come *ngIf, *ngFor ecc. */
+/* contiene direttive base come *ngIf, *ngFor ecc. */
 
 import { Component } from '@angular/core';
 
 import { Router } from '@angular/router';
-/* Router mi serve per reindirizzare dopo il login */
+/* mi serve per reindirizzare dopo il login */
 
 import { ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 
@@ -17,11 +17,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 
 import { AuthService } from '../../../../core/services/auth.service';
-/* importo AuthService per salvare/leggere il token */
+/* per salvare/leggere il token */
 
 const GOREST_TOKEN_PATTERN = /^[A-Za-z0-9_-]{30,}$/;
-/* pattern "ragionevole" per token API:
-   almeno 30 caratteri alfanumerici (più _ e -) */
+/* pattern per token API: almeno 30 caratteri alfanumerici */
 
 @Component({
   selector: 'app-login',
@@ -51,8 +50,6 @@ export class Login {
       Validators.required,
       Validators.pattern(GOREST_TOKEN_PATTERN),
     ],
-    /* required = token obbligatorio
-       pattern = formato token plausibile */
   });
 
   constructor(
@@ -80,7 +77,7 @@ export class Login {
     /* se l'utente incolla "Bearer <token>", tengo solo il token */
 
     if (!GOREST_TOKEN_PATTERN.test(token)) {
-      /* validazione finale difensiva (DRY col pattern sopra) */
+      /* validazione finale difensiva */
       this.tokenControl.setErrors({ tokenFormat: true });
       this.tokenControl.markAsTouched();
       return;

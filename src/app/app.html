@@ -18,16 +18,38 @@
   <!-- spacer per spingere i bottoni a destra -->
 
   <div class="toolbar-actions">
-    <button mat-button class="nav-btn" [routerLink]="['/users']">
-      Users
+    <button
+      mat-button
+      class="nav-btn"
+      [routerLink]="['/users']"
+      routerLinkActive="is-active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      matTooltip="Utenti"
+      matTooltipPosition="below"
+      matTooltipShowDelay="120"
+      aria-label="Utenti"
+    >
+      <span class="material-icons nav-icon" aria-hidden="true">groups</span>
+      <!-- solo icona: etichetta mostrata dal tooltip Material -->
     </button>
 
-    <button mat-button class="nav-btn" [routerLink]="['/posts']">
-      Posts
+    <button
+      mat-button
+      class="nav-btn"
+      [routerLink]="['/posts']"
+      routerLinkActive="is-active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      matTooltip="Post"
+      matTooltipPosition="below"
+      matTooltipShowDelay="120"
+      aria-label="Post"
+    >
+      <span class="material-icons nav-icon" aria-hidden="true">article</span>
+      <!-- solo icona: etichetta mostrata dal tooltip Material -->
     </button>
 
     <button mat-flat-button class="logout-btn" (click)="logout()">
-      Logout
+      Esci
     </button>
   </div>
 </mat-toolbar>

@@ -1,11 +1,10 @@
+/* salva/legge il token GoREST dal localStorage, controlla sessione attiva e gestisce logout */
+
 import { Injectable } from '@angular/core';
 
-const TOKEN_KEY = 'gorest_token'; /* chiave unica per localStorage:
-così non la ripeto in giro */
+const TOKEN_KEY = 'gorest_token'; /* chiave unica per localStorage: così non la ripeto in giro */
 
-@Injectable({ providedIn: 'root' }) /* providedIn root =
-questo service esiste una sola volta in tutta l'app */
-
+@Injectable({ providedIn: 'root' })
 export class AuthService {
 /* salvo il token */
   setToken(token: string): void {

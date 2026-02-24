@@ -1,16 +1,9 @@
-/* controlla se l'utente può entrare in una rota, blocca l'accsso se non autenticato
+/* controlla se l'utente può entrare in una rotta, blocca l'accsso se non autenticato
 ed eventualmente reinderizza al login */
 
 import { inject } from '@angular/core';
-/* inject mi permette di usare servizi senza constructor */
-
 import { CanActivateFn, Router } from '@angular/router';
-/* CanActivateFn = tipo della guard
-   Router = mi serve per fare redirect */
-
 import { AuthService } from '../services/auth.service';
-/* importo il mio AuthService per controllare se esiste il token */
-
 export const authGuard: CanActivateFn = (route, state) => {
   /* route = info sulla rotta corrente
      state = info sull'URL che sto cercando di aprire */

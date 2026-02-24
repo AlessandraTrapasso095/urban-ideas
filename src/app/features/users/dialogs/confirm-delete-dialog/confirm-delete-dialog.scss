@@ -1,7 +1,6 @@
 p {
   margin: 0;
 }
-/* reset semplice */
 
 .confirm-content {
   min-width: min(420px, 78vw);
@@ -16,4 +15,17 @@ p {
   font-weight: 700;
   color: #fff !important;
   background: linear-gradient(120deg, #d14f5f, #ef6e6e) !important;
+}
+
+@media (max-width: 520px) {
+  .confirm-content {
+    min-width: min(320px, 92vw);
+  }
+
+  .confirm-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
 }

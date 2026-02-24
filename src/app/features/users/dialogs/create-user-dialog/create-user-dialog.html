@@ -1,18 +1,18 @@
-<h2 mat-dialog-title class="dialog-title">{{ title }}</h2>
+<h2 mat-dialog-title class="ui-dialog-title">{{ title }}</h2>
 <!-- titolo del dialog -->
 
-<div mat-dialog-content class="dialog-content">
+<div mat-dialog-content class="ui-dialog-content ui-dialog-content-lg">
   <!-- contenuto principale del dialog -->
 
-  <p class="dialog-subtitle">
+  <p class="ui-dialog-subtitle">
     Inserisci i dati dell'utente e salva per aggiornare subito la lista.
   </p>
-  <!-- sottotitolo descrittivo coerente con lo stile delle card -->
+  <!-- DRY: uso classe dialog condivisa tra create-user e create-post -->
 
-  <form [formGroup]="form" class="form">
+  <form [formGroup]="form" class="ui-dialog-form">
     <!-- collego questo form al reactive form definito in TypeScript -->
 
-    <mat-form-field appearance="outline" class="full">
+    <mat-form-field appearance="outline" class="ui-dialog-field-full">
       <mat-label>Nome</mat-label>
       <input matInput formControlName="name" />
       <!-- formControlName collega l'input al controllo 'name' del form -->
@@ -28,7 +28,7 @@
       <!-- errore se troppo corto -->
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full">
+    <mat-form-field appearance="outline" class="ui-dialog-field-full">
       <mat-label>Email</mat-label>
       <input matInput formControlName="email" />
       <!-- collego l'input al controllo 'email' -->
@@ -42,10 +42,10 @@
       </mat-error>
     </mat-form-field>
 
-    <div class="grid-two">
+    <div class="ui-dialog-grid-two">
       <!-- metto le select in 2 colonne su desktop per una finestra più ordinata -->
 
-      <mat-form-field appearance="outline" class="half">
+      <mat-form-field appearance="outline" class="ui-dialog-field-half">
         <mat-label>Genere</mat-label>
         <mat-select formControlName="gender">
           <!-- collego la select al controllo 'gender' -->
@@ -57,7 +57,7 @@
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field appearance="outline" class="half">
+      <mat-form-field appearance="outline" class="ui-dialog-field-half">
         <mat-label>Status</mat-label>
         <mat-select formControlName="status">
           <!-- collego la select al controllo 'status' -->
@@ -70,24 +70,24 @@
       </mat-form-field>
     </div>
 
-    <p *ngIf="errorMessage" class="error">
+    <p *ngIf="errorMessage" class="ui-dialog-error">
      {{ errorMessage }}
     </p>
     <!-- mostro l'errore se la POST fallisce -->
   </form>
 </div>
 
-<div mat-dialog-actions align="end" class="dialog-actions">
+<div mat-dialog-actions align="end" class="ui-dialog-actions">
   <!-- area bottoni -->
 
-  <button mat-button class="btn-cancel" type="button" (click)="cancel()" [disabled]="isSubmitting">
+  <button mat-button class="ui-dialog-btn-cancel" type="button" (click)="cancel()" [disabled]="isSubmitting">
    Annulla
   </button>
   <!-- disabilito annulla durante invio, per evitare stati strani -->
 
   <button
     mat-flat-button
-    class="btn-confirm"
+    class="ui-dialog-btn-confirm"
     type="button"
     (click)="submit()"
     [disabled]="isSubmitting || form.invalid"

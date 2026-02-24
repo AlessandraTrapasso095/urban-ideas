@@ -1,25 +1,34 @@
 <!-- dialog creazione post -->
 
-<h2 mat-dialog-title>{{ 'Nuovo post' }}</h2>
+<h2 mat-dialog-title class="ui-dialog-title">
+  {{ dialogTitle }}
+</h2>
 
-<div mat-dialog-content class="dialog-content">
-  <form [formGroup]="form" class="form">
+<div mat-dialog-content class="ui-dialog-content ui-dialog-content-md">
+  <p class="ui-dialog-subtitle">
+    {{ isEditMode
+      ? 'Aggiorna i dati del post e salva le modifiche.'
+      : 'Inserisci i dati del post e pubblicalo sulla lista principale.' }}
+  </p>
+  <!-- uso classe dialog condivisa tra create-post e create-user -->
+
+  <form [formGroup]="form" class="ui-dialog-form">
     <!-- form reattivo collegato a create-post-dialog.ts -->
 
-    <mat-form-field appearance="outline" class="full">
-      <mat-label>User ID</mat-label>
+    <mat-form-field appearance="outline" class="ui-dialog-field-full">
+      <mat-label>ID utente</mat-label>
       <input matInput type="number" formControlName="user_id" />
 
       <mat-error *ngIf="form.get('user_id')?.touched && form.get('user_id')?.hasError('required')">
-        User ID obbligatorio
+        ID utente obbligatorio
       </mat-error>
 
       <mat-error *ngIf="form.get('user_id')?.touched && form.get('user_id')?.hasError('min')">
-        User ID deve essere maggiore di 0
+        ID utente deve essere maggiore di 0
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full">
+    <mat-form-field appearance="outline" class="ui-dialog-field-full">
       <mat-label>Titolo</mat-label>
       <input matInput formControlName="title" />
 
@@ -32,7 +41,7 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full">
+    <mat-form-field appearance="outline" class="ui-dialog-field-full">
       <mat-label>Testo</mat-label>
       <textarea matInput rows="4" formControlName="body"></textarea>
 
@@ -45,25 +54,25 @@
       </mat-error>
     </mat-form-field>
 
-    <p *ngIf="errorMessage" class="error">
+    <p *ngIf="errorMessage" class="ui-dialog-error">
       {{ errorMessage }}
     </p>
-    <!-- errore server se POST fallisce -->
+    <!-- errore server se richiesta POST/PUT fallisce -->
   </form>
 </div>
 
-<div mat-dialog-actions align="end" class="dialog-actions">
-  <button mat-button type="button" (click)="cancel()" [disabled]="isSubmitting">
+<div mat-dialog-actions align="end" class="ui-dialog-actions">
+  <button mat-button class="ui-dialog-btn-cancel" type="button" (click)="cancel()" [disabled]="isSubmitting">
     Annulla
   </button>
 
   <button
     mat-flat-button
-    class="btn-confirm"
+    class="ui-dialog-btn-confirm"
     type="button"
     (click)="submit()"
     [disabled]="isSubmitting || form.invalid"
   >
-    {{ isSubmitting ? 'Invio...' : 'Crea' }}
+    {{ isSubmitting ? submittingLabel : submitLabel }}
   </button>
 </div>

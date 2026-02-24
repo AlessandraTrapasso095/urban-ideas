@@ -96,4 +96,11 @@ export class PostsService {
     return this.http.post<Post>(`${this.baseUrl}/posts`, data);
     /* POST /posts */
   }
+
+  updatePost(id: number, data: CreatePostDto): Observable<Post> {
+    /* aggiorno un post esistente */
+
+    return this.http.put<Post>(`${this.baseUrl}/posts/${id}`, data);
+    /* PUT /posts/:id */
+  }
 }
