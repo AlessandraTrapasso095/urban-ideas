@@ -1,19 +1,14 @@
-/* definisco le rotte (URL) dell'app */
+/* rotte dell'app */
 
 import { authGuard } from './core/guards/auth-guard';
-
 import { Routes } from '@angular/router';
-/* importo Routes da angular router perché
-mi serve per tipizzare le rotte */
-
 export const routes: Routes = [
   {
     path: '',
-    /* root dell'app, cioè quando entro su http://localhost:4200 */
+    /* root dell'app, cioè quando entro su localhost */
 
     pathMatch: 'full',
-    /* matcha solo se l'URL è ESATTAMENTE vuoto,
-       così evito che faccia match parziali strani */
+    /* così evito che faccia match strani */
 
     redirectTo: 'auth',
     /* se sono sulla root mi manda direttamente alla pagina di login */
@@ -24,14 +19,10 @@ export const routes: Routes = [
     /* rotta per il login */
 
     loadComponent: () =>
-      /* uso loadComponent perché sono in standalone
-         e voglio fare lazy loading (carica solo quando serve) */
 
       import('./features/auth/pages/login/login')
-        /* import dinamico → crea uno chunk separato */
 
         .then((m) => m.Login),
-    /* m è il modulo importato dinamicamente e io prendo il LoginComponent da lì */
   },
 
   {
@@ -45,12 +36,11 @@ export const routes: Routes = [
       import('./features/users/pages/users-list/users-list').then(
         (m) => m.UsersList
       ),
-    /* stesso concetto che ho fatto sopra, lazy loading */
   },
 
   {
     path: 'users/:id',
-    /* rotta dettaglio utente: :id è un parametro dinamico (es. /users/123) */
+    /* rotta dettaglio utente */
 
     canActivate: [authGuard],
     /* proteggo anche questa rotta: serve token */
@@ -59,7 +49,6 @@ export const routes: Routes = [
       import('./features/users/pages/user-detail/user-detail').then(
         (m) => m.UserDetail
       ),
-    /* lazy loading: carico la pagina dettaglio solo quando serve */
   },
 
   {
@@ -73,12 +62,12 @@ export const routes: Routes = [
       import('./features/posts/pages/posts-list/posts-list').then(
         (m) => m.PostListComponent
       ),
-    /* qui il nome DEVE combaciare con l'export del file posts-list.ts */
+    /* qui il nome deve combaciare con l'export del file posts-list.ts */
   },
 
   {
     path: '**',
-    /* wildcard → per intercettare qualsiasi URL non definito sopra */
+    /* per intercettare qualsiasi URL non definito sopra */
 
     redirectTo: 'auth',
     /* se l'utente scrive un URL sbagliato, lo riporto al login per sicurezza */

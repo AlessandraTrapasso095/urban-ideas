@@ -15,9 +15,10 @@ import { PostsService } from '../../../users/services/posts.service';
 import { UsersService } from '../../../users/services/users.service';
 import { Post, PaginatedResponse } from '../../../users/models/gorest-models.model';
 import { PostCommentsComponent } from '../../../users/components/post-comments/post-comments';
+import { ConfirmDeleteDialog } from '../../../users/dialogs/confirm-delete-dialog/confirm-delete-dialog';
 import { CreatePostDialog } from '../../dialogs/create-post-dialog/create-post-dialog';
 import { buildHttpErrorMessage } from '../../../../core/utils/http-messages';
-import { DIALOG_SIZE_POST_FORM } from '../../../../core/constants/dialog-sizes';
+import { DIALOG_SIZE_CONFIRM, DIALOG_SIZE_POST_FORM } from '../../../../core/constants/dialog-sizes';
 import { runInAngular } from '../../../../core/utils/run-in-angular';
 import {
   normalizeSearchText,
@@ -295,6 +296,37 @@ export class PostListComponent implements OnInit {
 
       this.loadPosts();
       /* ricarico la pagina corrente con i dati aggiornati */
+    });
+  }
+
+  deletePost(post: Post): void {
+    const dialogRef = this.dialog.open(ConfirmDeleteDialog, {
+      ...DIALOG_SIZE_CONFIRM,
+      disableClose: true,
+      data: { name: post.title, itemType: 'post' },
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean | undefined) => {
+      if (!confirmed) return;
+
+      this.errorMessage = '';
+
+      this.postsService.deletePost(post.id).subscribe({
+        next: () => {
+          if (this.posts.length === 1 && this.page > 1) {
+            this.page -= 1;
+          }
+
+          this.expandedPostId = this.expandedPostId === post.id ? null : this.expandedPostId;
+          this.total = Math.max(0, this.total - 1);
+          this.loadPosts();
+        },
+        error: (err: unknown) => {
+          runInAngular(this.ngZone, this.cdr, () => {
+            this.errorMessage = buildHttpErrorMessage('eliminazione post', err);
+          });
+        },
+      });
     });
   }
 }

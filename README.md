@@ -1,59 +1,248 @@
-# UrbanIdeas: IN LOADING....
+# Urban Ideas
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.4.
+## A cosa serve questa app
 
-## Development server
+Urban Ideas e una web app che simula una piattaforma civica: permette alle persone di accedere con token, gestire utenti, pubblicare/modificare contenuti, leggere post e inserire commenti per raccogliere idee e segnalazioni utili alla vita urbana.
 
-To start a local development server, run:
+Applicazione Angular sviluppata per il progetto Start2Impact in partnership con NTT DATA.
+L'app usa le API pubbliche GoREST per gestire utenti, post e commenti in un contesto urbano/community.
+
+## 1) Obiettivo del progetto
+
+L'app permette di:
+
+1. autenticarsi tramite token GoREST;
+2. gestire utenti (lista, ricerca, creazione, modifica, eliminazione);
+3. consultare il dettaglio utente con post e commenti;
+4. consultare tutti i post, cercarli, creare nuovi post e modificarli;
+5. inserire commenti ai post;
+6. lavorare con route protette da autenticazione.
+
+## 2) Stack tecnico
+
+| Area | Tecnologie |
+|---|---|
+| Framework | Angular 21 (standalone components) |
+| UI | Angular Material + SCSS custom |
+| HTTP | HttpClient + interceptor Bearer token |
+| Routing | Angular Router con route guard |
+| Reactive | RxJS |
+| Test | Vitest (builder Angular) + coverage v8 |
+
+## 3) Librerie esterne utilizzate
+
+Dipendenze principali:
+
+1. `@angular/material`
+2. `@angular/cdk`
+3. `rxjs`
+4. `zone.js`
+
+Dipendenze di sviluppo:
+
+1. `vitest`
+2. `@vitest/coverage-v8`
+3. `jsdom`
+4. `@angular/cli`
+5. `@angular/build`
+6. `typescript`
+
+## 4) Prerequisiti
+
+Per eseguire il progetto in locale servono:
+
+1. Node.js LTS (consigliato >= 20)
+2. npm
+3. Git
+
+## 5) Setup locale passo passo
+
+1. Clono il repository:
 
 ```bash
-ng serve
+git clone https://github.com/AlessandraTrapasso095/urban-ideas.git
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+2. Entro nella cartella:
 
 ```bash
-ng generate component component-name
+cd urban-ideas
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+3. Installo le dipendenze:
 
 ```bash
-ng generate --help
+npm install
 ```
 
-## Building
-
-To build the project run:
+4. Avvio il server di sviluppo:
 
 ```bash
-ng build
+npm start
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+5. Apro il browser su:
 
-## Running unit tests
+```text
+http://localhost:4200
+```
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## 6) Login e token GoREST
+
+1. Genero il token personale da [GoREST Consumer Login](https://gorest.co.in/consumer/login).
+2. Apro l'app alla route `/auth`.
+3. Incollo il token nel campo di login.
+4. L'app salva il token in `localStorage` e lo usa come Bearer token nelle chiamate API.
+
+Note:
+
+1. Il token è locale al browser.
+2. Le route principali sono protette da guard (`/users`, `/users/:id`, `/posts`).
+
+## 7) Funzionalita implementate
+
+### 7.1 Utenti (`/users`)
+
+1. Lista utenti paginata.
+2. Ricerca per `name` o `email`.
+3. Selezione risultati per pagina (`10`, `20`, `50`).
+4. Creazione utente (dialog).
+5. Modifica utente (dialog).
+6. Eliminazione utente con conferma.
+7. Stato utente con pallino e tooltip.
+8. Vista responsive: tabella desktop + card mobile.
+
+### 7.2 Dettaglio utente (`/users/:id`)
+
+1. Blocco profilo con dati principali (id, email, gender, status).
+2. Elenco post dell'utente.
+3. Apertura/chiusura commenti per singolo post.
+4. Inserimento commento su post.
+
+### 7.3 Post (`/posts`)
+
+1. Feed post con stile social.
+2. Ricerca per titolo.
+3. Paginazione e risultati per pagina.
+4. Creazione post (dialog).
+5. Modifica post (dialog).
+6. Eliminazione post con conferma.
+7. Pulsante like locale UI.
+8. Apertura pannello commenti.
+9. Inserimento commento.
+10. Click sul nome autore con navigazione al dettaglio utente.
+
+### 7.4 Layout e UX
+
+1. Header con navigazione icon-based.
+2. Footer semplice.
+3. Spinner di caricamento.
+4. Dialog uniformi (stile condiviso).
+5. Responsive desktop/tablet/mobile.
+
+## 8) Architettura e best practice Angular
+
+Struttura principale:
+
+1. `src/app/core`
+2. `src/app/features/auth`
+3. `src/app/features/users`
+4. `src/app/features/posts`
+
+Scelte architetturali:
+
+1. Componenti standalone.
+2. Lazy loading delle pagine con `loadComponent`.
+3. Separazione chiara tra componenti, servizi, modelli e utility.
+4. `authGuard` per proteggere le route.
+5. `authTokenInterceptor` per aggiungere Bearer token a tutte le richieste.
+6. Servizio centrale `GorestApiService` per base URL e paginazione da header HTTP.
+7. Utility condivise DRY per errori HTTP, paginazione e stato utente.
+
+## 9) Comandi utili
+
+Avvio sviluppo:
 
 ```bash
-ng test
+npm start
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+Build:
 
 ```bash
-ng e2e
+npm run build
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Build in watch mode:
 
-## Additional Resources
+```bash
+npm run watch
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Test:
+
+```bash
+npm test
+```
+
+Test CI-style (senza watch) con coverage:
+
+```bash
+npm test -- --watch=false --coverage --coverage-reporters=text-summary
+```
+
+## 10) Testing e coverage
+
+La suite include test unitari su:
+
+1. pagine principali;
+2. servizi;
+3. guard;
+4. interceptor;
+5. utility.
+
+Ultima esecuzione locale coverage summary:
+
+1. Statements: `69.49%`
+2. Branches: `67.23%`
+3. Functions: `63.49%`
+4. Lines: `75.09%`
+
+## 11) API GoREST utilizzate
+
+Endpoint principali:
+
+1. `GET /users`
+2. `GET /users/:id`
+3. `POST /users`
+4. `PUT /users/:id`
+5. `DELETE /users/:id`
+6. `GET /posts`
+7. `POST /posts`
+8. `PUT /posts/:id`
+9. `GET /users/:id/posts`
+10. `GET /posts/:id/comments`
+11. `POST /posts/:id/comments`
+
+Base URL:
+
+```text
+https://gorest.co.in/public/v2
+```
+
+## 12) Note su DRY e manutenibilita
+
+Nel progetto ho applicato DRY con:
+
+1. utility condivise per paginazione;
+2. utility condivisa per label stato utente;
+3. utility condivisa per messaggi errore HTTP;
+4. servizio centrale API (`GorestApiService`);
+5. costanti condivise per dimensioni dialog;
+6. riuso del dialog post per create/edit.
+
+## 13) Possibili evoluzioni
+
+1. Deploy pubblico (consigliato: Vercel/Netlify/Firebase Hosting).
+2. Gestione stato avanzata con NgRx (opzionale ma apprezzata in traccia).
+3. Test e2e (Playwright/Cypress).

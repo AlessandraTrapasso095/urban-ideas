@@ -7,7 +7,7 @@
   <!-- contenuto -->
 
   <p>
-    Vuoi davvero eliminare questo utente
+    Vuoi davvero eliminare questo {{ data.itemType === 'post' ? 'post' : 'utente' }}
     <strong *ngIf="data.name">{{ data.name }}</strong
     ><span *ngIf="!data.name">?</span>
   </p>

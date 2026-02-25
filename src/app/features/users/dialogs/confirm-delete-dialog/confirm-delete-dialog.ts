@@ -1,21 +1,13 @@
+/* dialog di conferma eliminazione: mostra conferma e restituisce true/false al chiamante */
+
 import { Component, inject } from '@angular/core';
-/* Component = definisco componente; inject = DI moderna */
-
 import { CommonModule } from '@angular/common';
-/* CommonModule = per *ngIf */
-
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-/* MatDialogModule = struttura dialog */
-/* MatDialogRef = riferimento al dialog per chiuderlo */
-/* MAT_DIALOG_DATA = dati passati dal chiamante */
-
 import { MatButtonModule } from '@angular/material/button';
-/* MatButtonModule = bottoni Material */
 
 @Component({
   selector: 'app-confirm-delete-dialog',
   standalone: true,
-  /* standalone = nessun NgModule */
 
   imports: [CommonModule, MatDialogModule, MatButtonModule],
   /* import necessari per template */
@@ -29,7 +21,7 @@ export class ConfirmDeleteDialog {
   private dialogRef = inject(MatDialogRef<ConfirmDeleteDialog>);
   /* mi serve per chiudere il dialog */
 
-  data = inject(MAT_DIALOG_DATA) as { name?: string };
+  data = inject(MAT_DIALOG_DATA) as { name?: string; itemType?: 'utente' | 'post' };
   /* ricevo i dati (es. nome) dal chiamante */
 
   cancel(): void {

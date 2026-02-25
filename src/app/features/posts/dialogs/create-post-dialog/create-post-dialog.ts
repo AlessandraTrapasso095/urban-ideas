@@ -1,43 +1,16 @@
-/* dialog post:
-   gestisce creazione e modifica di un post
-   con validazione form e chiamate API */
+/* gestisce creazione e modifica di un post con validazione form e chiamate API */
 
 import { Component, inject, ChangeDetectorRef } from '@angular/core';
-/* Component = definisco componente */
-/* inject = dependency injection moderna */
-/* ChangeDetectorRef = mi permette di forzare il refresh della view */
-
 import { CommonModule } from '@angular/common';
-/* CommonModule = *ngIf */
-
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-/* ReactiveFormsModule = reactive forms */
-/* FormBuilder = costruisco form in modo pulito */
-/* Validators = validazioni pronte */
-
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-/* MatDialogModule = struttura dialog */
-/* MatDialogRef = riferimento al dialog per chiuderlo */
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-/* MAT_DIALOG_DATA = dati opzionali passati al dialog (utile per edit) */
-
 import { MatButtonModule } from '@angular/material/button';
-/* bottoni Material */
-
 import { MatFormFieldModule } from '@angular/material/form-field';
-/* wrapper input */
-
 import { MatInputModule } from '@angular/material/input';
-/* input e textarea */
-
 import { PostsService } from '../../../users/services/posts.service';
-/* chiamate API post */
-
 import { Post, CreatePostDto } from '../../../users/models/gorest-models.model';
-/* tipi DRY */
-
 import { buildHttpErrorMessage } from '../../../../core/utils/http-messages';
-/* DRY: messaggio errore standard */
 
 interface PostDialogData {
   /* dati opzionali che posso passare al dialog */
@@ -75,7 +48,6 @@ export class CreatePostDialog {
   /* se apro in modalità edit, qui arriva il post da modificare */
 
   private cdr = inject(ChangeDetectorRef);
-  /* mi serve per evitare NG0100 nei dialog */
 
   private readonly editPost = this.dialogData?.post ?? null;
   /* riferimento al post da modificare (se presente) */
@@ -97,10 +69,8 @@ export class CreatePostDialog {
     /* user_id deve essere > 0 */
 
     title: ['', [Validators.required, Validators.minLength(3)]],
-    /* titolo obbligatorio */
 
     body: ['', [Validators.required, Validators.minLength(3)]],
-    /* testo obbligatorio */
   });
 
   isSubmitting = false;
@@ -139,7 +109,6 @@ export class CreatePostDialog {
 
     const dto: CreatePostDto = {
       user_id: Number(this.form.controls.user_id.value),
-      /* IMPORTANTISSIMO: forzo user_id a number */
 
       title: this.form.controls.title.value.trim(),
       body: this.form.controls.body.value.trim(),
@@ -151,14 +120,12 @@ export class CreatePostDialog {
       this.isEditMode && this.editPost
         ? this.postsService.updatePost(this.editPost.id, dto)
         : this.postsService.createPost(dto);
-    /* DRY: una sola request variabile in base alla modalità */
 
     const actionLabel = this.isEditMode ? 'modifica post' : 'creazione post';
-    /* etichetta usata nel messaggio errore standard */
+    /* etichetta usata nel messaggio errore */
 
     request$.subscribe({
       next: (created: Post) => {
-        /* rimando update stato per evitare NG0100 */
 
         setTimeout(() => {
           this.isSubmitting = false;
@@ -169,7 +136,6 @@ export class CreatePostDialog {
       },
 
       error: (err: any) => {
-        /* rimando update stato per evitare NG0100 */
 
         setTimeout(() => {
           this.isSubmitting = false;
@@ -186,7 +152,6 @@ export class CreatePostDialog {
             : base;
 
           this.cdr.detectChanges();
-          /* forzo refresh view */
         }, 0);
       },
     });

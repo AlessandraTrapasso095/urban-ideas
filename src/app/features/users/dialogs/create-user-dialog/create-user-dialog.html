@@ -1,21 +1,19 @@
+<!-- dialog utente: stesso template usato per creazione e modifica -->
 <h2 mat-dialog-title class="ui-dialog-title">{{ title }}</h2>
-<!-- titolo del dialog -->
 
 <div mat-dialog-content class="ui-dialog-content ui-dialog-content-lg">
-  <!-- contenuto principale del dialog -->
 
   <p class="ui-dialog-subtitle">
     Inserisci i dati dell'utente e salva per aggiornare subito la lista.
   </p>
-  <!-- DRY: uso classe dialog condivisa tra create-user e create-post -->
+  <!-- uso classe dialog condivisa tra create-user e create-post -->
 
   <form [formGroup]="form" class="ui-dialog-form">
-    <!-- collego questo form al reactive form definito in TypeScript -->
 
     <mat-form-field appearance="outline" class="ui-dialog-field-full">
       <mat-label>Nome</mat-label>
       <input matInput formControlName="name" />
-      <!-- formControlName collega l'input al controllo 'name' del form -->
+      <!-- collega l'input al controllo 'name' del form -->
 
       <mat-error *ngIf="form.get('name')?.touched && form.get('name')?.hasError('required')">
         Il nome è obbligatorio
@@ -43,7 +41,6 @@
     </mat-form-field>
 
     <div class="ui-dialog-grid-two">
-      <!-- metto le select in 2 colonne su desktop per una finestra più ordinata -->
 
       <mat-form-field appearance="outline" class="ui-dialog-field-half">
         <mat-label>Genere</mat-label>
@@ -73,7 +70,7 @@
     <p *ngIf="errorMessage" class="ui-dialog-error">
      {{ errorMessage }}
     </p>
-    <!-- mostro l'errore se la POST fallisce -->
+    <!-- mostro l'errore se POST fallisce -->
   </form>
 </div>
 
@@ -83,7 +80,7 @@
   <button mat-button class="ui-dialog-btn-cancel" type="button" (click)="cancel()" [disabled]="isSubmitting">
    Annulla
   </button>
-  <!-- disabilito annulla durante invio, per evitare stati strani -->
+  <!-- disabilito annulla durante invio -->
 
   <button
     mat-flat-button
@@ -94,5 +91,4 @@
   >
     {{ isSubmitting ? 'Invio...' : submitLabel }}
   </button>
-  <!-- testo dinamico per far capire che sta inviando -->
 </div>

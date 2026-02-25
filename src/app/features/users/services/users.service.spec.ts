@@ -36,7 +36,6 @@ describe('UsersService', () => {
   });
 
   it('getUsers should call gorestApi.getPaginated with users resource', () => {
-    /* testo delega DRY verso service centrale */
     const paginatedSpy = vi.spyOn(gorestApi, 'getPaginated').mockReturnValue(
       of({ data: [], page: 2, pages: 3, total: 30, limit: 10 })
     );

@@ -1,6 +1,5 @@
 <!-- HEADER VISIBILE SOLO SE LOGGATA -->
 <mat-toolbar color="primary" *ngIf="isLoggedIn()" class="app-toolbar">
-  <!-- blocco brand in alto a sinistra dentro header -->
   <div class="header-brand">
     <button type="button" class="header-logo-btn" (click)="goHome()">
       <img
@@ -11,11 +10,9 @@
     </button>
 
     <span class="header-brand-title">Urban Ideas</span>
-    <!-- scritta a destra del logo -->
   </div>
 
   <span class="toolbar-spacer"></span>
-  <!-- spacer per spingere i bottoni a destra -->
 
   <div class="toolbar-actions">
     <button
@@ -30,7 +27,6 @@
       aria-label="Utenti"
     >
       <span class="material-icons nav-icon" aria-hidden="true">groups</span>
-      <!-- solo icona: etichetta mostrata dal tooltip Material -->
     </button>
 
     <button
@@ -45,7 +41,6 @@
       aria-label="Post"
     >
       <span class="material-icons nav-icon" aria-hidden="true">article</span>
-      <!-- solo icona: etichetta mostrata dal tooltip Material -->
     </button>
 
     <button mat-flat-button class="logout-btn" (click)="logout()">
@@ -54,7 +49,15 @@
   </div>
 </mat-toolbar>
 
-<!-- QUI ANGULAR CARICA LE PAGINE -->
 <main class="app-main">
   <router-outlet></router-outlet>
 </main>
+
+<!-- FOOTER  -->
+<footer class="app-footer">
+  <div class="app-footer-content">
+    <span class="footer-brand">Urban Ideas</span>
+    <span class="footer-separator" aria-hidden="true">•</span>
+    <span class="footer-copy">Progetto Angular Start2Impact • 2026</span>
+  </div>
+</footer>

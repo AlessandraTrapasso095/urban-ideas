@@ -1,4 +1,4 @@
-/* test unitari componente commenti post */
+/* test componente commenti post */
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SimpleChange } from '@angular/core';

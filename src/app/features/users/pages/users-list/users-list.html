@@ -20,13 +20,12 @@
       >
         +
       </button>
-      <!-- azione create portata in alto a destra: più visibile e coerente -->
     </header>
 
     <div *ngIf="isLoading" class="loading-wrap">
       <span class="ui-spinner" aria-hidden="true"></span>
     </div>
-    <!-- spinner caricamento utenti -->
+    <!-- caricamento utenti -->
     <!-- loading -->
 
     <p *ngIf="!isLoading && errorMessage" class="status-msg error">
@@ -82,8 +81,8 @@
     </div>
 
     <div class="table-wrap desktop-table-wrap">
+      <!-- vista desktop: tabella completa -->
       <table mat-table [dataSource]="dataSource" class="users-table">
-        <!-- tabella material: uso dataSource (MatTableDataSource) -->
 
         <ng-container matColumnDef="id">
           <th mat-header-cell *matHeaderCellDef>ID</th>
@@ -116,7 +115,6 @@
               matTooltipShowDelay="120"
               [attr.aria-label]="statusLabel(user.status)"
             ></span>
-            <!-- tooltip Material in overlay: non si taglia dentro la tabella -->
           </td>
         </ng-container>
 
@@ -137,6 +135,7 @@
     </div>
 
     <section class="users-mobile-list">
+      <!-- vista mobile: card singola per ogni utente -->
       <article class="user-mobile-card" *ngFor="let user of dataSource.data">
         <div class="user-mobile-head">
           <button mat-button class="name-link" type="button" (click)="goToDetail(user)">

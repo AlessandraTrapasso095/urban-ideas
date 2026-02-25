@@ -224,6 +224,12 @@
   font-size: 0.86rem;
 }
 
+.post-admin-actions {
+  display: grid;
+  gap: 8px;
+  min-width: 120px;
+}
+
 .edit-post-btn {
   border: 0;
   border-radius: 10px;
@@ -239,6 +245,23 @@
 .edit-post-btn:hover {
   transform: translateY(-1px);
   background: rgba(46, 137, 214, 0.22);
+}
+
+.delete-post-btn {
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font: inherit;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(120deg, #e55f6f, #cf2f47);
+  cursor: pointer;
+  transition: transform 160ms ease, filter 160ms ease;
+}
+
+.delete-post-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.04);
 }
 
 .feed-content h2 {
@@ -362,7 +385,12 @@
     flex-wrap: wrap;
   }
 
-  .edit-post-btn {
+  .post-admin-actions {
+    width: 100%;
+  }
+
+  .post-admin-actions .edit-post-btn,
+  .post-admin-actions .delete-post-btn {
     width: 100%;
   }
 

@@ -1,9 +1,10 @@
+/* test pagina utenti: verifico ricerca, paginazione, dialog e delete */
+
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
-
 import { UsersList } from './users-list';
 import { UsersService } from '../../services/users.service';
 import { User } from '../../models/gorest-models.model';
@@ -35,6 +36,7 @@ describe('UsersList', () => {
   };
 
   beforeEach(async () => {
+    /* preparo valori di default restituiti dai mock */
     usersServiceMock.getUsers.mockReturnValue(
       of({ data: [sampleUser], page: 1, pages: 3, total: 30, limit: 10 })
     );
@@ -48,6 +50,7 @@ describe('UsersList', () => {
     });
 
     routerMock.navigate.mockReturnValue(Promise.resolve(true));
+    /* simulo navigazione avvenuta con successo */
 
     await TestBed.configureTestingModule({
       imports: [UsersList],
@@ -61,8 +64,6 @@ describe('UsersList', () => {
     fixture = TestBed.createComponent(UsersList);
     component = fixture.componentInstance;
     (component as any).dialog = dialogMock;
-    /* forzo mock dialog sull'istanza:
-       evito uso di MatDialog reale nei test metodi */
   });
 
   afterEach(() => {
@@ -83,6 +84,7 @@ describe('UsersList', () => {
   });
 
   it('applySearch should call getUsers when search is empty', () => {
+    /* con ricerca vuota devo chiamare getUsers */
     component.searchText = '   ';
     component.page = 2;
     component.perPage = 20;
@@ -100,6 +102,7 @@ describe('UsersList', () => {
   });
 
   it('applySearch should call searchUsers when search has text', () => {
+    /* con testo ricerca devo chiamare searchUsers */
     component.searchText = 'mario';
     component.searchField = 'name';
     component.page = 1;
@@ -113,6 +116,7 @@ describe('UsersList', () => {
   });
 
   it('applySearch should set errorMessage on error', () => {
+    /* in caso errore API devo mostrare messaggio utente */
     usersServiceMock.getUsers.mockReturnValueOnce(
       throwError(() => ({ status: 500 }))
     );
@@ -126,6 +130,7 @@ describe('UsersList', () => {
   });
 
   it('goPrev should not change page when already on first page', () => {
+    /* in pagina 1 non torno indietro */
     const spy = vi.spyOn(component, 'applySearch');
     component.page = 1;
 
@@ -136,6 +141,7 @@ describe('UsersList', () => {
   });
 
   it('goPrev should decrement page and call applySearch', () => {
+    /* se posso tornare indietro, ricarico */
     const spy = vi.spyOn(component, 'applySearch').mockImplementation(() => {});
     component.page = 3;
 
@@ -146,6 +152,7 @@ describe('UsersList', () => {
   });
 
   it('goNext should not change page when already on last page', () => {
+    /* in ultima pagina non avanzo */
     const spy = vi.spyOn(component, 'applySearch');
     component.page = 2;
     component.pages = 2;
@@ -157,6 +164,7 @@ describe('UsersList', () => {
   });
 
   it('goNext should increment page and call applySearch', () => {
+    /* se posso avanzare, ricarico */
     const spy = vi.spyOn(component, 'applySearch').mockImplementation(() => {});
     component.page = 1;
     component.pages = 4;
@@ -168,6 +176,7 @@ describe('UsersList', () => {
   });
 
   it('resetFilters should restore defaults and call applySearch', () => {
+    /* reset deve riportare tutti i filtri ai default */
     const spy = vi.spyOn(component, 'applySearch');
 
     component.searchText = 'abc';
@@ -185,6 +194,7 @@ describe('UsersList', () => {
   });
 
   it('onPerPageChange should set page to 1 and call applySearch', () => {
+    /* cambio perPage = torno pagina 1 e ricarico */
     const spy = vi.spyOn(component, 'applySearch');
     component.page = 5;
 
@@ -195,12 +205,14 @@ describe('UsersList', () => {
   });
 
   it('goToDetail should navigate to user detail route', () => {
+    /* click nome utente = navigazione a /users/:id */
     component.goToDetail(sampleUser);
 
     expect(routerMock.navigate).toHaveBeenCalledWith(['/users', 1]);
   });
 
   it('openCreateUserDialog should reload list when user is created', () => {
+    /* se dal dialog torna utente creato, ricarico dalla pagina 1 */
     const applySpy = vi.spyOn(component, 'applySearch');
 
     dialogMock.open.mockReturnValueOnce({
@@ -232,6 +244,7 @@ describe('UsersList', () => {
   });
 
   it('requestDelete should stop when dialog is not confirmed', () => {
+    /* se non confermo delete, non chiamo API */
     dialogMock.open.mockReturnValueOnce({
       afterClosed: () => of(false),
     });
@@ -242,6 +255,7 @@ describe('UsersList', () => {
   });
 
   it('requestDelete should remove row and call applySearch when confirmed', () => {
+    /* conferma delete: rimuovo riga, aggiorno e ricarico */
     vi.useFakeTimers();
 
     const applySpy = vi.spyOn(component, 'applySearch').mockImplementation(() => {});
@@ -267,6 +281,7 @@ describe('UsersList', () => {
   });
 
   it('requestDelete should set errorMessage when delete fails', () => {
+    /* errore mostro messaggio utente */
     vi.useFakeTimers();
 
     dialogMock.open.mockReturnValueOnce({

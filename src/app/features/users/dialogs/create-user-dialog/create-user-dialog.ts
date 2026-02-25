@@ -1,44 +1,17 @@
+/* dialog creazione/modifica utente: gestisce form reactive, validazione e salvataggio via API */
+
 import { Component, inject } from '@angular/core';
-/* Component = definisco componente */
-/* inject = dependency injection moderna senza constructor */
-
 import { CommonModule } from '@angular/common';
-/* CommonModule = per *ngIf e *ngFor nel template */
-
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-/* ReactiveFormsModule = abilita reactive forms */
-/* FormBuilder = costruisco il form in modo pulito */
-/* Validators = validazioni pronte */
-
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-/* MatDialogModule = struttura dialog */
-/* MatDialogRef = riferimento al dialog aperto (chiusura + valore di ritorno) */
-/* MAT_DIALOG_DATA = dati passati dal componente che apre il dialog */
-
 import { MatButtonModule } from '@angular/material/button';
-/* bottoni Material */
-
 import { MatFormFieldModule } from '@angular/material/form-field';
-/* wrapper input Material */
-
 import { MatInputModule } from '@angular/material/input';
-/* input Material */
-
 import { MatSelectModule } from '@angular/material/select';
-/* select Material */
-
 import { UsersService } from '../../services/users.service';
-/* UsersService = chiamate API (POST/PUT) */
-
 import { CreateUserDto, User, UserGender, UserStatus } from '../../models/gorest-models.model';
-/* CreateUserDto = payload di creazione */
-/* User = tipo utente */
-/* UserGender/UserStatus = union types */
-
 import { finalize } from 'rxjs/operators';
-
 import { buildHttpErrorMessage } from '../../../../core/utils/http-messages';
-/* DRY: messaggi errore standard */
 
 @Component({
   selector: 'app-create-user-dialog',
@@ -61,49 +34,38 @@ export class CreateUserDialog {
   /* questo dialog serve sia per CREATE che per EDIT */
 
   private fb = inject(FormBuilder);
-  /* prendo FormBuilder */
 
   private usersService = inject(UsersService);
-  /* prendo il service (lo useremo nello step successivo per POST/PUT) */
 
   private dialogRef = inject(MatDialogRef<CreateUserDialog>);
   /* riferimento al dialog per chiuderlo */
 
   data = inject(MAT_DIALOG_DATA) as { user?: User } | null;
-  /* data può contenere user se siamo in EDIT; se null/undefined siamo in CREATE */
+  /* data può contenere user se in EDIT; se null/undefined è in CREATE */
 
   isEditMode = !!this.data?.user;
-  /* true se ho ricevuto un utente -> EDIT */
+  /* true se ho ricevuto un utente = EDIT */
 
   title = this.isEditMode ? 'Modifica utente' : 'Nuovo utente';
-  /* titolo dinamico */
 
   submitLabel = this.isEditMode ? 'Salva' : 'Crea';
-  /* testo bottone dinamico */
 
   genders: readonly UserGender[] = ['male', 'female'];
-  /* valori validi */
 
   statuses: readonly UserStatus[] = ['active', 'inactive'];
-  /* valori validi */
 
   form = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
-    /* nome obbligatorio */
 
     email: ['', [Validators.required, Validators.email]],
-    /* email obbligatoria e valida */
 
     gender: ['female' as UserGender, [Validators.required]],
-    /* valore iniziale gender */
 
     status: ['active' as UserStatus, [Validators.required]],
-    /* valore iniziale status */
   });
-  /* creo il form */
 
   isSubmitting = false;
-  /* quando invieremo al server lo useremo per bloccare i bottoni */
+  /* quando invio al server lo uso per bloccare i bottoni */
 
   errorMessage = '';
   /* eventuale errore */
@@ -128,7 +90,7 @@ export class CreateUserDialog {
     /* chiudo senza fare nulla */
 
     this.dialogRef.close(undefined);
-    /* restituisco undefined al chiamante */
+    /* restituisco undefined */
   }
 
   submit(): void {
@@ -182,16 +144,15 @@ export class CreateUserDialog {
       )
       .subscribe({
         next: (savedUser: User) => {
-          /* se va a buon fine, ricevo l'utente salvato (creato o aggiornato) */
+          /* se va a buon fine, ricevo l'utente salvato */
 
           this.dialogRef.close(savedUser);
-          /* chiudo il dialog e restituisco al chiamante l'utente aggiornato */
+          /* chiudo il dialog e restituisco l'utente aggiornato */
         },
         error: (err: unknown) => {
          this.errorMessage = this.isEditMode
            ? buildHttpErrorMessage('modifica utente', err)
            : buildHttpErrorMessage('creazione utente', err);
-           /* messaggio standard, cambia solo l’azione */
           },
       });
   }

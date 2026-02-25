@@ -1,7 +1,8 @@
+/* test del dialog utente: verifica creazione componente */
+
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-
 import { CreateUserDialog } from './create-user-dialog';
 import { UsersService } from '../../services/users.service';
 
@@ -36,6 +37,7 @@ describe('CreateUserDialog', () => {
   });
 
   it('should create', () => {
+    /* il componente deve essere creato */
     expect(component).toBeTruthy();
   });
 });

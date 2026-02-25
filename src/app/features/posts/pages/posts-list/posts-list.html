@@ -75,9 +75,15 @@
               </div>
             </div>
 
-            <button type="button" class="edit-post-btn" (click)="openEditPostDialog(post)">
-              Modifica
-            </button>
+            <div class="post-admin-actions">
+              <button type="button" class="edit-post-btn" (click)="openEditPostDialog(post)">
+                Modifica
+              </button>
+
+              <button type="button" class="delete-post-btn" (click)="deletePost(post)">
+                Elimina
+              </button>
+            </div>
           </header>
 
           <div class="feed-content">

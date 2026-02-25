@@ -1,5 +1,7 @@
 :host {
-  display: block;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
 }
 
 .app-toolbar {
@@ -116,7 +118,42 @@
 }
 
 .app-main {
+  flex: 1 1 auto;
   padding: 8px 18px 30px;
+}
+
+.app-footer {
+  margin-top: auto;
+  padding: 14px 18px 18px;
+}
+
+.app-footer-content {
+  max-width: 1180px;
+  margin: 0 auto;
+  border-radius: 14px;
+  border: 1px solid rgba(34, 69, 105, 0.14);
+  background: rgba(255, 255, 255, 0.72);
+  color: #284560;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.footer-brand {
+  font-family: 'Sora', 'Space Grotesk', sans-serif;
+  color: #173452;
+}
+
+.footer-separator {
+  opacity: 0.55;
+}
+
+.footer-copy {
+  color: #446283;
 }
 
 @media (max-width: 980px) {
@@ -157,6 +194,10 @@
 
   .app-main {
     padding: 8px 14px 24px;
+  }
+
+  .app-footer {
+    padding: 10px 14px 14px;
   }
 }
 
@@ -214,6 +255,16 @@
 
   .app-main {
     padding: 8px 10px 20px;
+  }
+
+  .app-footer {
+    padding: 8px 10px 12px;
+  }
+
+  .app-footer-content {
+    font-size: 0.86rem;
+    padding: 9px 10px;
+    gap: 6px;
   }
 }
 

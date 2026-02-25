@@ -1,6 +1,4 @@
-/* test unitari CreatePostDialog:
-   verifico create/edit mode e invio form
-   senza chiamate HTTP reali */
+/* verifico create/edit mode e invio form */
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
@@ -18,13 +16,13 @@ describe('CreatePostDialog', () => {
   const dialogRefMock = {
     close: vi.fn(),
   };
-  /* mock dialog: mi serve per verificare close senza aprire modali reali */
+  /* mi serve per verificare close senza aprire modali reali */
 
   const postsServiceMock = {
     createPost: vi.fn(),
     updatePost: vi.fn(),
   };
-  /* mock service: evito HTTP reali e controllo quale metodo viene chiamato */
+  /* evito HTTP e controllo quale metodo viene chiamato */
 
   const buildComponent = async (dialogData: { post?: Post } | null = null) => {
     await TestBed.configureTestingModule({

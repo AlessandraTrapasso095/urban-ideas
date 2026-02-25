@@ -1,28 +1,16 @@
+/* componente root dell'app: gestisco header, navigazione principale e logout */
+
 import { Component } from '@angular/core';
-/* Component = definisco il componente root */
-
 import { RouterOutlet, RouterLink, Router, RouterLinkActive } from '@angular/router';
-/* RouterOutlet = punto dove vengono caricate le pagine */
-/* RouterLink = per creare link nel template */
-/* RouterLinkActive = mi aiuta a evidenziare la sezione attiva */
-/* Router = per fare redirect nel logout */
-
 import { MatToolbarModule } from '@angular/material/toolbar';
-/* toolbar Material */
-
 import { MatButtonModule } from '@angular/material/button';
-/* bottoni Material */
 import { MatTooltipModule } from '@angular/material/tooltip';
-/* tooltip Material per mostrare etichetta su hover */
-
 import { CommonModule } from '@angular/common';
-/* mi serve per *ngIf */
-
 import { AuthService } from './core/services/auth.service';
-/* mi serve per sapere se sono loggata e per fare logout */
 
 @Component({
   selector: 'app-root',
+  /* nome tag usato in index.html */
   standalone: true,
 
   imports: [
@@ -48,6 +36,11 @@ export class App {
   isLoggedIn(): boolean {
     /* controllo se esiste token */
     return this.authService.isLoggedIn();
+  }
+
+  isAuthRoute(): boolean {
+    /* su /auth non devo mostrare header */
+    return this.router.url.startsWith('/auth');
   }
 
   goHome(): void {
