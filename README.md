@@ -9,7 +9,7 @@ L'app usa le API pubbliche GoREST per gestire utenti, post e commenti in un cont
 
 ## Demo online
 
-[https://urban-ideas.netlify.app/](https://urban-ideas.netlify.app/)
+Netflify: [https://urban-ideas.netlify.app/](https://urban-ideas.netlify.app/)
 
 ## 1) Obiettivo del progetto
 
