@@ -7,6 +7,10 @@ Urban Ideas e una web app che simula una piattaforma civica: permette alle perso
 Applicazione Angular sviluppata per il progetto Start2Impact in partnership con NTT DATA.
 L'app usa le API pubbliche GoREST per gestire utenti, post e commenti in un contesto urbano/community.
 
+## Demo online
+
+[https://urban-ideas.netlify.app/](https://urban-ideas.netlify.app/)
+
 ## 1) Obiettivo del progetto
 
 L'app permette di:
