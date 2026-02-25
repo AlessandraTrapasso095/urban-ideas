@@ -10,6 +10,7 @@ L'app usa le API pubbliche GoREST per gestire utenti, post e commenti in un cont
 ## Demo online e repository
 
 Netlify: [https://urban-ideas.netlify.app/](https://urban-ideas.netlify.app/)
+
 GitHub Repository: [https://github.com/AlessandraTrapasso095/urban-ideas.git] (https://github.com/AlessandraTrapasso095/urban-ideas.git)
 
 ## 1) Obiettivo del progetto
